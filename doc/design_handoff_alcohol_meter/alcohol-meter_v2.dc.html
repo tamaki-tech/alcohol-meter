@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/industry-80bb8952-4709-41d7-a846-5af5bea11ba6/styles.css">
+<script src="_ds/industry-80bb8952-4709-41d7-a846-5af5bea11ba6/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f2f2f3}a{color:#416180}a:hover{color:#3f3f46}.dv-turn{padding:40px 48px 36px;border-bottom:1px solid rgba(29,31,32,.12);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 24px}.dv-tid{font:600 11px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1d1f20;color:#f2f2f3;text-decoration:none}.dv-tname{font:600 22px/1.2 "Barlow Condensed",sans-serif;color:#1d1f20}.dv-opts{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px;width:376px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(29,31,32,.1);color:#1d1f20;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:600 16px/1.3 "Barlow Condensed",sans-serif;color:#1d1f20}.dv-cap{font:400 13px/1.6 Barlow,sans-serif;color:#5d5d60;margin:0;text-wrap:pretty}.dv-opt:target .dv-oid{background:#18181b;color:#fff}.dv-next{margin:24px 0 0;font:13px/1.5 Barlow,sans-serif;color:#5d5d60}</style>
+</helmet>
+
+<section class="dv-turn" id="intro" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:48px;align-items:start">
+  <div>
+    <div style="font-size:11px;letter-spacing:.12em;color:#52525b;font-weight:500">UI / UX DESIGN · ANDROID · DARK FIRST · v2 shadcn 寄せ</div>
+    <h1 style="font-size:56px;margin:8px 0 12px">alcohol-meter</h1>
+    <p style="font-size:15px;color:#424244;max-width:520px;margin:0">CLAUDE.md の仕様に沿った全画面のデザインです。飲み会中の画面は <a class="dv-oid" href="#1b">1b</a> を採用（比較用に <a class="dv-oid" href="#1a">1a</a> <a class="dv-oid" href="#1c">1c</a> も残しています）。3 案ともタップで記録・取り消しできます。</p>
+  </div>
+  <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);padding:20px 24px">
+    
+    <div style="font-family:var(--font-heading);font-weight:600;font-size:20px;margin-bottom:12px">手早く記録するための設計</div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 28px;font-size:13.5px;line-height:1.6;color:#424244">
+      <div><b style="color:#1d1f20">1 タップで確定</b><br>確認なし。押した瞬間に記録し、5 秒の「取り消し」で誤タップを救う。</div>
+      <div><b style="color:#1d1f20">親指ゾーンに集約</b><br>ドリンクボタンは画面下半分。最小 88dp、2〜3 列のグリッド。</div>
+      <div><b style="color:#1d1f20">色＋アイコン＋名前</b><br>暗い店内でも種類が一瞬でわかる。プリセット色はボタン下辺の帯に。</div>
+      <div><b style="color:#1d1f20">破壊的操作は遠くに</b><br>「お開き」は右上、ドリンクから最も遠い位置。確認ダイアログを挟む。</div>
+      <div><b style="color:#1d1f20">手応え</b><br>押下時に触覚フィードバック、杯数が一瞬拡大。種類ごとの杯数もボタンに表示。</div>
+      <div><b style="color:#1d1f20">アプリを開かずに記録</b><br>常駐通知のアクションから 1 杯追加（最大 3 種）。</div>
+    </div>
+  </div>
+</section>
+
+<section class="dv-turn" id="t1">
+  <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">ホーム（飲み会中）— 3 案</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt" id="1a">
+      <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>標準グリッド</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>{{ clock }}</span><span>5G 82%</span></div>
+        <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 20px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent)"></span><span style="font-family:var(--font-heading);font-weight:600;font-size:19px">飲み会中</span><span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ startLabel }} 〜</span></div>
+          <button class="btn btn-secondary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:48px;padding:0 18px;font-size:16px;color:inherit">お開き</button>
+        </div>
+        <div style="padding:4px 20px 0;flex:none">
+          <div style="font-size:12px;letter-spacing:.06em;color:color-mix(in srgb,var(--color-text) 62%,transparent)">経過時間</div>
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:68px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em">{{ elapsed }}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;margin-top:14px;border-top:1px solid var(--color-divider)">
+            <div style="padding:12px 0">
+              <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">杯数</div>
+              <div style="display:flex;align-items:baseline;gap:4px"><span style="font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:1.05;display:inline-block;transform-origin:left bottom;transition:transform .18s;transform:scale({{ a.scale }})">{{ a.cups }}</span><span style="font-size:16px">杯</span></div>
+              <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">純アルコール {{ a.g }} g</div>
+            </div>
+            <div style="padding:12px 0 12px 16px;border-left:1px solid var(--color-divider)">
+              <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">推定 BAC</div>
+              <div style="display:flex;align-items:baseline;gap:4px;color:var(--color-accent)"><span style="font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:1.05">{{ a.bac }}</span><span style="font-size:16px">%</span></div>
+              <div style="font-size:12px;white-space:nowrap;color:color-mix(in srgb,var(--color-text) 62%,transparent)">しらふ目安 {{ a.sober }}</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">推定値です。運転してよいかの判断には使えません</div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px">
+          <sc-for list="{{ a.drinks }}" as="d" hint-placeholder-count="6">
+            <button onClick="{{ d.tap }}" aria-label="{{ d.aria }}" style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);position:relative;height:92px;background:transparent;color:inherit;font:inherit;text-align:left;padding:10px 12px 14px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden" style-active="background:rgba(250,250,250,.1)">
+              
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%">
+                <svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:{{ d.color }};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ d.icon }}"></path></svg>
+                <span style="font-family:var(--font-heading);font-weight:600;font-size:20px;line-height:1">{{ d.countLabel }}</span>
+              </div>
+              <div><div style="font-family:var(--font-heading);font-weight:600;font-size:19px;line-height:1.1">{{ d.name }}</div><div style="font-size:11.5px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ d.spec }}</div></div>
+              <span style="position:absolute;left:0;right:0;bottom:0;height:3px;background:{{ d.color }}"></span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ a.snack }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:12px;right:12px;bottom:76px;border-radius:12px;background:#fafafa;color:#09090b;box-shadow:0 12px 32px rgba(0,0,0,.5);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px"><span style="flex:1;font-size:14px">{{ a.snackText }}</span><button onClick="{{ a.undo }}" style="min-height:48px;padding:0 14px;background:transparent;border:0;font:600 16px var(--font-heading);color:#09090b;cursor:pointer;text-decoration:underline">取り消し</button></div>
+            <div style="height:3px;background:#09090b;width:{{ a.snackPct }}%"></div>
+          </div>
+        </sc-if>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navHome }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">仕様どおりの 3 指標＋2×3 グリッド。ボタン右上に種類ごとの杯数。迷ったらこの案。</p>
+    </div>
+
+    <div class="dv-opt" id="1b">
+      <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>「もう 1 杯」優先 <span style="font:500 11px Barlow,sans-serif;padding:2px 8px;background:#18181b;color:#fff">採用</span></div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>{{ clock }}</span><span>5G 82%</span></div>
+        <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 20px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent)"></span><span style="font-family:var(--font-heading);font-weight:600;font-size:19px">飲み会中</span><span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ startLabel }} 〜</span></div>
+          <button class="btn btn-secondary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:48px;padding:0 18px;font-size:16px;color:inherit">お開き</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1.25fr 1fr 1.15fr;margin:0 16px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);flex:none">
+          <div style="padding:10px 0"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">経過</div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums">{{ elapsed }}</div></div>
+          <div style="padding:10px 0 10px 12px;border-left:1px solid var(--color-divider)"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">杯数</div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;display:inline-block;transform-origin:left bottom;transition:transform .18s;transform:scale({{ b.scale }})">{{ b.cups }}<span style="font-size:15px;font-weight:400"> 杯</span></div></div>
+          <div style="padding:10px 0 10px 12px;border-left:1px solid var(--color-divider)"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">推定 BAC</div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;color:var(--color-accent)">{{ b.bac }}<span style="font-size:15px;font-weight:400">%</span></div></div>
+        </div>
+        <div style="padding:6px 16px 0;font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent);flex:none">純アルコール {{ b.g }} g ・ 推定値です。運転してよいかの判断には使えません</div>
+        <div style="padding:14px 16px 0;flex:none">
+          <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent);margin-bottom:6px">最近の 3 杯</div>
+          <sc-for list="{{ b.recent }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;height:26px;font-size:14px"><span style="width:10px;height:10px;border-radius:50%;background:{{ r.color }}"></span><span style="font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--color-text) 62%,transparent);width:44px">{{ r.time }}</span><span>{{ r.name }}</span></div>
+          </sc-for>
+        </div>
+        <div style="flex:1"></div>
+        <div style="padding:0 16px 12px">
+          <button onClick="{{ b.again }}" aria-label="{{ b.againAria }}" class="btn btn-primary" style="border-radius:14px;font-family:var(--font-body);font-weight:600;white-space:nowrap;flex:none;width:100%;height:112px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;padding:0 20px;position:relative;color:#09090b;background:var(--color-accent);border:1px solid var(--color-accent);border-radius:10px;overflow:hidden" style-active="background:#d4d4d8">
+            
+            <span style="font-family:var(--font-body);font-weight:500;font-size:13px">もう 1 杯</span>
+            <span style="display:flex;align-items:center;gap:10px;font-size:30px;line-height:1.1"><svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ b.lastIcon }}"></path></svg>{{ b.lastName }}</span>
+          </button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 16px">
+          <sc-for list="{{ b.drinks }}" as="d" hint-placeholder-count="6">
+            <button onClick="{{ d.tap }}" aria-label="{{ d.aria }}" style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);position:relative;height:88px;background:transparent;color:inherit;font:inherit;text-align:left;padding:8px 10px 12px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden" style-active="background:rgba(250,250,250,.1)">
+              
+              <div style="display:flex;justify-content:space-between;width:100%"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:{{ d.color }};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ d.icon }}"></path></svg><span style="font-family:var(--font-heading);font-weight:600;font-size:17px">{{ d.countLabel }}</span></div>
+              <div style="font-family:var(--font-heading);font-weight:600;font-size:15px;line-height:1.1;white-space:nowrap">{{ d.short }}</div>
+              <span style="position:absolute;left:0;right:0;bottom:0;height:3px;background:{{ d.color }}"></span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ b.snack }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:12px;right:12px;bottom:76px;border-radius:12px;background:#fafafa;color:#09090b;box-shadow:0 12px 32px rgba(0,0,0,.5);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px"><span style="flex:1;font-size:14px">{{ b.snackText }}</span><button onClick="{{ b.undo }}" style="min-height:48px;padding:0 14px;background:transparent;border:0;font:600 16px var(--font-heading);color:#09090b;cursor:pointer;text-decoration:underline">取り消し</button></div>
+            <div style="height:3px;background:#09090b;width:{{ b.snackPct }}%"></div>
+          </div>
+        </sc-if>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navHome }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">2 杯目以降は同じお酒が続きがち。直前の 1 杯を親指位置の最大ボタンに。別の種類は下の 3 列から。</p>
+    </div>
+
+    <div class="dv-opt" id="1c">
+      <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>集計カウンター型</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>{{ clock }}</span><span>5G 82%</span></div>
+        <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 20px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent)"></span><span style="font-family:var(--font-heading);font-weight:600;font-size:19px;font-variant-numeric:tabular-nums">{{ elapsed }}</span></div>
+          <button class="btn btn-secondary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:48px;padding:0 18px;font-size:16px;color:inherit">お開き</button>
+        </div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:4px 20px 12px;flex:none">
+          <div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:var(--font-heading);font-weight:600;font-size:76px;line-height:.9;display:inline-block;transform-origin:left bottom;transition:transform .18s;transform:scale({{ c.scale }})">{{ c.cups }}</span><span style="font-size:18px">杯</span></div>
+          <div style="text-align:right"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">推定 BAC（推定値）</div><div style="font-family:var(--font-heading);font-weight:600;font-size:36px;line-height:1;color:var(--color-accent)">{{ c.bac }}%</div><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">純アルコール {{ c.g }} g</div></div>
+        </div>
+        <div style="padding:0 20px 8px;font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent);flex:none">運転してよいかの判断には使えません</div>
+        <div style="flex:1"></div>
+        <div style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ c.drinks }}" as="d" hint-placeholder-count="6">
+            <button onClick="{{ d.tap }}" aria-label="{{ d.aria }}" style="height:76px;display:flex;align-items:center;gap:14px;padding:0 12px 0 16px;background:transparent;border:0;border-bottom:1px solid var(--color-divider);color:inherit;font:inherit;text-align:left;cursor:pointer" style-active="background:rgba(250,250,250,.1)">
+              <span style="width:44px;height:44px;flex:none;border-radius:10px;display:grid;place-items:center;background:{{ d.color }};color:#09090b"><svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ d.icon }}"></path></svg></span>
+              <span style="flex:1;min-width:0"><span style="display:block;font-family:var(--font-heading);font-weight:600;font-size:20px;line-height:1.1">{{ d.name }}</span><span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ d.spec }}</span></span>
+              <span style="font-family:var(--font-heading);font-weight:600;font-size:30px;min-width:28px;text-align:right">{{ d.count }}</span>
+              <span style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);width:52px;height:52px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round"><path d="M5 12h14 M12 5v14"></path></svg></span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ c.snack }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:12px;right:12px;bottom:76px;border-radius:12px;background:#fafafa;color:#09090b;box-shadow:0 12px 32px rgba(0,0,0,.5);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px"><span style="flex:1;font-size:14px">{{ c.snackText }}</span><button onClick="{{ c.undo }}" style="min-height:48px;padding:0 14px;background:transparent;border:0;font:600 16px var(--font-heading);color:#09090b;cursor:pointer;text-decoration:underline">取り消し</button></div>
+            <div style="height:3px;background:#09090b;width:{{ c.snackPct }}%"></div>
+          </div>
+        </sc-if>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navHome }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">行全体が 1 杯ボタン（高さ 76dp・全幅）。左右どちらの親指でも届き、種類別の杯数が縦に揃う。</p>
+    </div>
+  </div>
+  <p class="dv-next">次の例: 「<a class="dv-oid" href="#1b">1b</a> のもう 1 杯ボタンを <a class="dv-oid" href="#1a">1a</a> に足して」・「<a class="dv-oid" href="#1c">1c</a> の行をもっと低く」</p>
+</section>
+
+<section class="dv-turn" id="flow">
+  <div class="dv-thd"><a class="dv-tid" href="#flow">A</a><span class="dv-tname">開始前 → お開き → サマリ</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt">
+      <div class="dv-olabel">ホーム（開始前）</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>18:52</span><span>5G 91%</span></div>
+        <div style="padding:16px 20px 0;flex:none"><div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">今日</div><div style="font-family:var(--font-heading);font-weight:600;font-size:24px">11月18日（水）</div></div>
+        <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);margin:16px 16px 0;padding:18px 20px">
+          
+          <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:var(--font-heading);font-weight:600;font-size:96px;line-height:.9;color:var(--color-accent)">3</span><span style="font-family:var(--font-heading);font-weight:600;font-size:24px">日連続 休肝日</span></div>
+          <div style="display:flex;gap:20px;margin-top:12px;font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)"><span>最長記録 4 日</span><span>今月の休肝日 12 日</span></div>
+        </div>
+        <div style="padding:24px 20px 8px;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">直近の飲み会</div>
+        <div style="margin:0 16px;display:flex;align-items:center;gap:12px;padding:14px 12px 14px 16px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden;min-height:64px">
+          <div style="flex:1"><div style="font-family:var(--font-heading);font-weight:600;font-size:18px">11/14（土）</div><div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">19:02–23:40 ・ 7 杯 ・ 114.8 g</div></div>
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg>
+        </div>
+        <div style="flex:1"></div>
+        <div style="padding:0 16px 20px">
+          <div style="text-align:center;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent);margin-bottom:10px">押した時刻から記録を始めます</div>
+          <button class="btn btn-primary" style="border-radius:14px;font-family:var(--font-body);font-weight:600;white-space:nowrap;flex:none;width:100%;height:112px;gap:14px;font-size:40px;color:#09090b;background:var(--color-accent);border:1px solid var(--color-accent);border-radius:10px;overflow:hidden;position:relative">
+            
+            <svg viewBox="0 0 24 24" style="width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.beer }}"></path></svg>乾杯！
+          </button>
+        </div>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navHome }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">「乾杯！」は親指位置に唯一の塗りボタンとして。前回のアルコールが残っていれば休肝日カードの下に推定 BAC を表示。</p>
+    </div>
+    <div class="dv-opt">
+      <div class="dv-olabel">ホーム（開始前・前回分が残っている）</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>08:10</span><span>5G 88%</span></div>
+        <div style="padding:16px 20px 0;flex:none"><div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">今日</div><div style="font-family:var(--font-heading);font-weight:600;font-size:24px">11月15日（日）</div></div>
+        <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);margin:16px 16px 0;padding:16px 20px">
+          
+          <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">昨夜のアルコール（推定）</div>
+          <div style="display:flex;align-items:baseline;gap:4px;color:var(--color-accent)"><span style="font-family:var(--font-heading);font-weight:600;font-size:64px;line-height:1">0.026</span><span style="font-size:18px">%</span></div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;font-size:14px"><span style="color:color-mix(in srgb,var(--color-text) 62%,transparent)">しらふの目安</span><span style="font-family:var(--font-heading);font-weight:600;font-size:22px">09:55</span><span style="color:color-mix(in srgb,var(--color-text) 62%,transparent)">ごろ</span></div>
+          <div style="font-size:11px;margin-top:8px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">推定値です。運転してよいかの判断には使えません</div>
+        </div>
+        <div style="margin:12px 16px 0;padding:14px 16px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden;display:flex;align-items:baseline;justify-content:space-between">
+          <span style="font-size:14px">今日を休肝日にすると</span><span style="font-family:var(--font-heading);font-weight:600;font-size:20px">連続 1 日目</span>
+        </div>
+        <div style="padding:24px 20px 8px;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">直近の飲み会</div>
+        <div style="margin:0 16px;display:flex;align-items:center;gap:12px;padding:14px 12px 14px 16px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden;min-height:64px">
+          <div style="flex:1"><div style="font-family:var(--font-heading);font-weight:600;font-size:18px">11/14（土）</div><div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">19:02–23:40 ・ 7 杯 ・ 114.8 g</div></div>
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg>
+        </div>
+        <div style="flex:1"></div>
+        <div style="padding:0 16px 20px">
+          <button class="btn btn-primary" style="border-radius:14px;font-family:var(--font-body);font-weight:600;white-space:nowrap;flex:none;width:100%;height:112px;gap:14px;font-size:40px;color:#09090b;background:var(--color-accent);border:1px solid var(--color-accent);border-radius:10px;overflow:hidden;position:relative">
+            
+            <svg viewBox="0 0 24 24" style="width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.beer }}"></path></svg>乾杯！
+          </button>
+        </div>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navHome }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">前回分が残っている間は、休肝日カードの位置に推定 BAC としらふ目安を出す。0 になったら休肝日カードに戻る。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">お開き確認</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>21:46</span><span>5G 64%</span></div>
+        <div style="padding:20px;opacity:.5">
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:19px">飲み会中</div>
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:68px;line-height:1;margin-top:20px">2:42:05</div>
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:48px;margin-top:16px">5 杯</div>
+        </div>
+        <div style="position:absolute;inset:0;background:rgba(5,6,7,.72);display:flex;align-items:flex-end;padding:0 16px 24px">
+          <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);width:100%;background:var(--color-surface);padding:22px 20px 16px;display:flex;flex-direction:column;gap:14px">
+            
+            <div style="font-family:var(--font-heading);font-weight:600;font-size:26px">お開きにしますか？</div>
+            <div style="font-size:14px;color:color-mix(in srgb,var(--color-text) 75%,transparent)">5 杯 ・ 2 時間 42 分。記録はヘルスコネクトに送られます。</div>
+            <div>
+              <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent);margin-bottom:6px">終了時刻</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden">
+                <div style="min-height:52px;display:flex;flex-direction:column;justify-content:center;padding:0 12px;background:var(--color-accent);color:#09090b"><span style="font-size:12px">今</span><span style="font-family:var(--font-heading);font-weight:600;font-size:20px;line-height:1">21:46</span></div>
+                <div style="min-height:52px;display:flex;flex-direction:column;justify-content:center;padding:0 12px;border-left:1px solid var(--color-divider)"><span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">最後の 1 杯</span><span style="font-family:var(--font-heading);font-weight:600;font-size:20px;line-height:1">21:14</span></div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+              <button class="btn btn-secondary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:56px;font-size:18px;color:inherit">まだ飲む</button>
+              <button class="btn btn-primary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:56px;font-size:18px;color:#09090b;background:var(--color-accent)">お開き</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="dv-cap">下寄せで片手で届く。終了時刻は「今／最後の 1 杯」を選べる（お開き忘れ通知から来た時は「最後の 1 杯」が初期値）。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">サマリ（スクロール全体）</div>
+      <div style="width:360px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>21:46</span><span>5G 64%</span></div>
+        <div style="padding:16px 20px 0"><div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">おつかれさまでした</div><div style="font-family:var(--font-heading);font-weight:600;font-size:28px">11/18（水）の飲み会</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;margin:14px 16px 0;border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ sum.stats }}" as="s" hint-placeholder-count="4"><div style="padding:10px 4px;border-bottom:1px solid var(--color-divider)"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ s.k }}</div><div style="font-family:var(--font-heading);font-weight:600;font-size:26px;line-height:1.15">{{ s.v }}</div></div></sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 0">
+          <sc-for list="{{ sum.byType }}" as="t" hint-placeholder-count="4"><span style="white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:4px 10px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden"><span style="width:8px;height:8px;border-radius:50%;background:{{ t.color }}"></span>{{ t.label }}</span></sc-for>
+        </div>
+        <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);margin:20px 16px 0;padding:14px 14px 10px">
+          
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:var(--font-heading);font-weight:600;font-size:17px">推定 BAC の推移</span><span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">最大 {{ sum.peak }}%</span></div>
+          <svg viewBox="0 0 300 130" style="width:100%;height:auto;display:block;margin-top:8px;overflow:visible">
+            <line x1="0" y1="110" x2="300" y2="110" style="stroke:rgba(250,250,250,.25);stroke-width:1"></line>
+            <polygon points="{{ sum.area }}" style="fill:rgba(250,250,250,.1)"></polygon>
+            <polyline points="{{ sum.line }}" style="fill:none;stroke:#fafafa;stroke-width:1.75;stroke-linejoin:round"></polyline>
+            <sc-for list="{{ sum.dots }}" as="p"><circle cx="{{ p.x }}" cy="110" r="3" style="fill:{{ p.color }}"></circle></sc-for>
+            <sc-for list="{{ sum.ticks }}" as="t"><text x="{{ t.x }}" y="126" style="font-size:10px;fill:rgba(250,250,250,.62);text-anchor:middle">{{ t.label }}</text></sc-for>
+          </svg>
+          <div style="font-size:13px;margin-top:6px">しらふの目安 <b style="font-family:var(--font-heading);font-size:18px">{{ sum.sober }}</b> ごろ</div>
+          <div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">推定値です。運転してよいかの判断には使えません</div>
+        </div>
+        <div style="padding:20px 20px 6px;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">飲んだ順</div>
+        <div style="margin:0 16px;border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ sum.logs }}" as="l" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:12px;height:48px;border-bottom:1px solid var(--color-divider);font-size:14px"><span style="width:44px;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ l.time }}</span><span style="width:10px;height:10px;border-radius:50%;background:{{ l.color }}"></span><span style="flex:1">{{ l.name }}</span><span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ l.g }} g</span></div></sc-for>
+        </div>
+        <div style="margin:16px 16px 0;display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden;font-size:13px">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:var(--color-accent);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>
+          <span style="flex:1">ヘルスコネクトに送信済み（5 件）</span>
+        </div>
+        <div style="padding:20px 16px 24px"><button class="btn btn-secondary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;width:100%;min-height:56px;font-size:18px;color:inherit">閉じる</button></div>
+      </div>
+      <p class="dv-cap">上から「数字 → 推移 → 明細 → 連携状態」。連携失敗時は同じ枠に「再送信」を出す。</p>
+    </div>
+  </div>
+</section>
+
+<section class="dv-turn" id="records">
+  <div class="dv-thd"><a class="dv-tid" href="#records">B</a><span class="dv-tname">履歴・カレンダー</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt">
+      <div class="dv-olabel">履歴一覧</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>18:52</span><span>5G 91%</span></div>
+        <div style="padding:16px 20px 8px;font-family:var(--font-heading);font-weight:600;font-size:28px">履歴</div>
+        <div style="flex:1;overflow:hidden">
+          <sc-for list="{{ history }}" as="h" hint-placeholder-count="7">
+            <sc-if value="{{ h.isHeader }}" hint-placeholder-val="{{ false }}"><div style="padding:16px 20px 6px;font-size:12px;letter-spacing:.06em;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ h.label }}</div></sc-if>
+            <sc-if value="{{ h.isRow }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:12px;margin:0 16px;padding:12px 4px;min-height:68px;border-top:1px solid var(--color-divider)">
+                <div style="width:58px"><div style="font-family:var(--font-heading);font-weight:600;font-size:22px;line-height:1">{{ h.date }}</div><div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ h.dow }}</div></div>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;white-space:nowrap">{{ h.range }}</div><div style="white-space:nowrap;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ h.meta }}</div></div>
+                <span style="white-space:nowrap;flex:none;font-size:11px;padding:3px 8px;border:1px solid {{ h.tagBorder }};border-radius:999px;color:{{ h.tagColor }}">{{ h.tag }}</span>
+                <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.6"><path d="m9 18 6-6-6-6"></path></svg>
+              </div>
+            </sc-if>
+          </sc-for>
+        </div>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider);background:var(--color-bg)">
+          <sc-for list="{{ navHist }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">新しい順・月で区切る。連携状態は失敗時のみ強調（「送信失敗」はタップで再送信）。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">履歴詳細・1 杯の編集</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>18:53</span><span>5G 91%</span></div>
+        <div style="height:56px;display:flex;align-items:center;gap:4px;padding:0 4px">
+          <span style="width:48px;height:48px;display:grid;place-items:center"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m15 18-6-6 6-6"></path></svg></span>
+          <span style="flex:1;font-family:var(--font-heading);font-weight:600;font-size:20px">11/14（土）</span>
+          <span style="width:48px;height:48px;display:grid;place-items:center"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round"><path d="M12 5h.01 M12 12h.01 M12 19h.01"></path></svg></span>
+        </div>
+        <div style="padding:0 20px 10px;font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">19:02–23:40 ・ 4 時間 38 分 ・ 7 杯 ・ 114.8 g</div>
+        <div style="margin:0 16px;border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ detail }}" as="l" hint-placeholder-count="7"><div style="display:flex;align-items:center;gap:12px;height:52px;border-bottom:1px solid var(--color-divider);font-size:14px;background:{{ l.bg }}"><span style="width:44px;padding-left:4px;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ l.time }}</span><span style="width:10px;height:10px;border-radius:50%;background:{{ l.color }}"></span><span style="flex:1">{{ l.name }}</span><svg viewBox="0 0 24 24" style="width:18px;height:18px;margin-right:6px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.6"><path d="{{ I.pencil }}"></path></svg></div></sc-for>
+        </div>
+        <div style="position:absolute;inset:0;background:rgba(5,6,7,.6)"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;border-radius:20px 20px 0 0;background:var(--color-surface);border-top:1px solid var(--color-divider);padding:10px 16px 20px;display:flex;flex-direction:column;gap:14px">
+          <div style="width:36px;height:4px;border-radius:999px;background:rgba(250,250,250,.3);align-self:center"></div>
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:22px">1 杯を編集</div>
+          <div>
+            <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent);margin-bottom:6px">種類</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+              <sc-for list="{{ editChips }}" as="e" hint-placeholder-count="6"><div style="min-height:48px;display:flex;align-items:center;gap:6px;padding:0 8px;font-size:13px;border:1px solid {{ e.border }};border-radius:8px;background:{{ e.bg }}"><span style="width:8px;height:8px;flex:none;border-radius:50%;background:{{ e.color }}"></span>{{ e.short }}</div></sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent);margin-bottom:6px">時刻</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:0 14px;border:1px solid var(--color-accent);border-radius:10px;overflow:hidden"><span style="font-family:var(--font-heading);font-weight:600;font-size:24px">20:52</span><span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">11/14（土）</span></div>
+          </div>
+          <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">保存するとヘルスコネクトの記録も更新されます</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="btn btn-ghost" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:48px;font-size:16px;gap:6px;color:#fafafa;margin-right:auto"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.trash }}"></path></svg>削除</button>
+            <button class="btn btn-secondary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:48px;padding:0 18px;font-size:16px;color:inherit">キャンセル</button>
+            <button class="btn btn-primary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:48px;padding:0 22px;font-size:16px;color:#09090b;background:var(--color-accent)">保存</button>
+          </div>
+        </div>
+      </div>
+      <p class="dv-cap">行タップでボトムシート。削除は左端に離して置き、実行前に確認。飲み会ごとの削除は右上メニューから。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">カレンダー</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>18:52</span><span>5G 91%</span></div>
+        <div style="display:flex;align-items:center;padding:12px 4px 8px 20px">
+          <span style="flex:1;font-family:var(--font-heading);font-weight:600;font-size:28px">2026年 11月</span>
+          <span style="width:48px;height:48px;display:grid;place-items:center"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m15 18-6-6 6-6"></path></svg></span>
+          <span style="width:48px;height:48px;display:grid;place-items:center;opacity:.35"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 16px">
+          <sc-for list="{{ dows }}" as="w" hint-placeholder-count="7"><div style="text-align:center;font-size:11px;padding:4px 0;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ w }}</div></sc-for>
+          <sc-for list="{{ cal }}" as="c" hint-placeholder-count="30"><div style="height:42px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:14px;background:{{ c.bg }};color:{{ c.fg }};outline:{{ c.ol }};outline-offset:-1px"><span>{{ c.d }}</span><span style="width:5px;height:5px;border-radius:50%;background:{{ c.dot }}"></span></div></sc-for>
+        </div>
+        <div style="display:flex;gap:16px;padding:12px 20px 0;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:4px;background:rgba(250,250,250,.16)"></span>休肝日</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border:1px solid #27272a;display:grid;place-items:center"><span style="width:4px;height:4px;border-radius:50%;background:#fafafa"></span></span>飲んだ日</span>
+          <span>区切り AM 3:00</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;margin:20px 16px 0;border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ calStats }}" as="s" hint-placeholder-count="4"><div style="padding:12px 4px;border-bottom:1px solid var(--color-divider)"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ s.k }}</div><div style="font-family:var(--font-heading);font-weight:600;font-size:28px;line-height:1.15;color:{{ s.color }}">{{ s.v }}<span style="font-size:14px;font-weight:400"> {{ s.u }}</span></div></div></sc-for>
+        </div>
+        <div style="flex:1"></div>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navCal }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">休肝日をアクセント色で塗り、前向きな日として見せる。飲んだ日は控えめなドット。今日は枠線のみ（未確定）。</p>
+    </div>
+  </div>
+</section>
+
+<section class="dv-turn" id="settings">
+  <div class="dv-thd"><a class="dv-tid" href="#settings">C</a><span class="dv-tname">設定・プリセット編集</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt">
+      <div class="dv-olabel">設定</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>18:52</span><span>5G 91%</span></div>
+        <div style="padding:16px 20px 4px;font-family:var(--font-heading);font-weight:600;font-size:28px">設定</div>
+        <div style="flex:1;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;padding:12px 20px 6px;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)"><span>ドリンクプリセット</span><span>通知に表示 3/3</span></div>
+          <div style="margin:0 16px;border-top:1px solid var(--color-divider)">
+            <sc-for list="{{ presetRows }}" as="p" hint-placeholder-count="6"><div style="display:flex;align-items:center;gap:10px;height:52px;border-bottom:1px solid var(--color-divider)">
+              <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;opacity:.45"><path d="M9 5h.01 M9 12h.01 M9 19h.01 M15 5h.01 M15 12h.01 M15 19h.01"></path></svg>
+              <svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:none;fill:none;stroke:{{ p.color }};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ p.icon }}"></path></svg>
+              <span style="flex:1;font-size:14px">{{ p.name }}</span>
+              <span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ p.spec }}</span>
+              <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex:none;margin-right:4px;fill:none;stroke:{{ p.bell }};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.bell }}"></path></svg>
+            </div></sc-for>
+          </div>
+          <div style="margin:8px 16px 0;min-height:48px;display:flex;align-items:center;gap:8px;color:var(--color-accent);font-family:var(--font-heading);font-weight:600;font-size:16px"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round"><path d="M5 12h14 M12 5v14"></path></svg>プリセットを追加</div>
+          <div style="padding:16px 20px 6px;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">推定 BAC の計算</div>
+          <div style="margin:0 16px;border-top:1px solid var(--color-divider)">
+            <sc-for list="{{ settingRows }}" as="s" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;min-height:52px;border-bottom:1px solid var(--color-divider);font-size:14px;padding:0 4px"><span style="flex:1">{{ s.k }}</span><span style="color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ s.v }}</span></div></sc-for>
+          </div>
+        </div>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navSet }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">並び順＝飲み会中のボタン順。ベルが点いた 3 件が通知アクションに出る。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">プリセット編集</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>18:54</span><span>5G 91%</span></div>
+        <div style="height:56px;display:flex;align-items:center;gap:4px;padding:0 8px 0 4px">
+          <span style="width:48px;height:48px;display:grid;place-items:center"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M18 6 6 18 M6 6l12 12"></path></svg></span>
+          <span style="flex:1;font-family:var(--font-heading);font-weight:600;font-size:20px">プリセットを編集</span>
+          <button class="btn btn-primary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:44px;padding:0 18px;font-size:16px;color:#09090b;background:var(--color-accent)">保存</button>
+        </div>
+        <div style="padding:8px 16px 0">
+          <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent);margin-bottom:6px">ボタンの見え方</div>
+          <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);position:relative;width:160px;height:92px;padding:10px 12px 14px;display:flex;flex-direction:column;justify-content:space-between">
+            
+            <svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:oklch(0.80 0.09 215);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.glass }}"></path></svg>
+            <div><div style="font-family:var(--font-heading);font-weight:600;font-size:19px;line-height:1.1">ハイボール</div><div style="font-size:11.5px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">350 ml ・ 7%</div></div>
+            <span style="position:absolute;left:0;right:0;bottom:0;height:4px;background:oklch(0.80 0.09 215)"></span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:18px 16px 0">
+          <div><div style="font-size:12px;margin-bottom:5px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">名前</div><div style="min-height:48px;display:flex;align-items:center;padding:0 12px;border:1px solid var(--color-accent);border-radius:10px;overflow:hidden;font-size:15px">ハイボール</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:12px;margin-bottom:5px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">量</div><div style="min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden;font-size:15px"><span>350</span><span style="color:color-mix(in srgb,var(--color-text) 62%,transparent)">ml</span></div></div>
+            <div><div style="font-size:12px;margin-bottom:5px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">度数</div><div style="min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden;font-size:15px"><span>7</span><span style="color:color-mix(in srgb,var(--color-text) 62%,transparent)">%</span></div></div>
+          </div>
+          <div><div style="font-size:12px;margin-bottom:5px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">種類（ヘルスコネクト）</div><div style="min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden;font-size:15px"><span>ハイボール（HIGHBALL）</span><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m6 9 6 6 6-6"></path></svg></div></div>
+          <div><div style="font-size:12px;margin-bottom:6px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">色</div>
+            <div style="display:flex;gap:8px"><sc-for list="{{ swatches }}" as="s" hint-placeholder-count="6"><span style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;outline:{{ s.ol }};outline-offset:2px;background:{{ s.color }}"></span></sc-for></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;min-height:56px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+            <div style="flex:1"><div style="font-size:15px">通知に出す</div><div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">最大 3 件（現在 3 件）</div></div>
+            <span style="width:48px;height:28px;border-radius:999px;background:var(--color-accent);position:relative;flex:none"><span style="position:absolute;right:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#09090b"></span></span>
+          </div>
+        </div>
+      </div>
+      <p class="dv-cap">色は暗所でも見分けやすい 6 色の固定パレットから選ぶ。上部に実物のボタンプレビュー。量・度数は数字キーボード。「量 × 度数」から純アルコール量を自動計算。</p>
+    </div>
+  </div>
+</section>
+
+<section class="dv-turn" id="onboarding">
+  <div class="dv-thd"><a class="dv-tid" href="#onboarding">D</a><span class="dv-tname">オンボーディング・非対応端末</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt">
+      <div class="dv-olabel">2/4 体重・性別</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>12:30</span><span>5G 100%</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:16px 20px 0"><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span><span style="border-radius:999px;height:3px;background:var(--color-divider)"></span><span style="border-radius:999px;height:3px;background:var(--color-divider)"></span></div>
+        <div style="padding:28px 20px 0"><div style="font-family:var(--font-heading);font-weight:600;font-size:32px;line-height:1.15">体重と性別を<br>教えてください</div><div style="font-size:14px;margin-top:8px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">推定 BAC の計算だけに使います。端末の外には送りません。</div></div>
+        <div style="padding:28px 20px 0">
+          <div style="font-size:12px;margin-bottom:6px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">体重</div>
+          <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0 8px;border-bottom:2px solid var(--color-accent)"><span style="font-family:var(--font-heading);font-weight:600;font-size:64px;line-height:1">65.0</span><span style="font-size:18px">kg</span></div>
+          <div style="font-size:12px;margin-top:8px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">ヘルスコネクトの最新値（11/12）を入れています</div>
+        </div>
+        <div style="padding:28px 20px 0">
+          <div style="font-size:12px;margin-bottom:6px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">性別</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden"><div style="min-height:56px;display:grid;place-items:center;font-size:16px;background:var(--color-accent);color:#09090b">男性</div><div style="min-height:56px;display:grid;place-items:center;font-size:16px;border-left:1px solid var(--color-divider)">女性</div></div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="padding:0 16px 24px"><button class="btn btn-primary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;width:100%;min-height:56px;font-size:18px;color:#09090b;background:var(--color-accent)">次へ</button></div>
+      </div>
+      <p class="dv-cap">1/4 の対応チェックはスプラッシュ中に自動で実行（対応なら画面を出さない）。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">3/4 ヘルスコネクト</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>12:31</span><span>5G 100%</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:16px 20px 0"><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span><span style="border-radius:999px;height:3px;background:var(--color-divider)"></span></div>
+        <div style="padding:28px 20px 0"><div style="font-family:var(--font-heading);font-weight:600;font-size:32px;line-height:1.15">ヘルスコネクトと<br>連携します</div><div style="font-size:14px;margin-top:8px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">お開きのたびに、飲んだお酒を 1 杯ずつ記録します。</div></div>
+        <div style="margin:24px 16px 0;border-top:1px solid var(--color-divider)">
+          <div style="display:flex;gap:12px;padding:14px 4px;border-bottom:1px solid var(--color-divider)"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:none;fill:none;stroke:var(--color-accent);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.pencil }}"></path></svg><div><div style="font-size:15px">飲酒記録の書き込み</div><div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">種類・量・度数・時刻</div></div></div>
+          <div style="display:flex;gap:12px;padding:14px 4px;border-bottom:1px solid var(--color-divider)"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:none;fill:none;stroke:var(--color-accent);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.pulse }}"></path></svg><div><div style="font-size:15px">体重の読み取り</div><div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">BAC の計算に最新の体重を使う</div></div></div>
+        </div>
+        <div style="padding:14px 20px 0;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">他のアプリの飲酒記録は読み込みません。</div>
+        <div style="flex:1"></div>
+        <div style="padding:0 16px 24px;display:flex;flex-direction:column;gap:8px"><button class="btn btn-primary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;width:100%;min-height:56px;font-size:18px;color:#09090b;background:var(--color-accent)">ヘルスコネクトで許可</button><button class="btn btn-ghost" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;width:100%;min-height:48px;font-size:16px">連携せずに使う</button></div>
+      </div>
+      <p class="dv-cap">拒否してもアプリ内の記録だけで使える。サマリ・履歴・設定に「未連携」と表示し、設定からいつでも連携できる。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">4/4 通知</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>12:31</span><span>5G 100%</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:16px 20px 0"><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span><span style="border-radius:999px;height:3px;background:var(--color-accent)"></span></div>
+        <div style="padding:28px 20px 0"><div style="font-family:var(--font-heading);font-weight:600;font-size:32px;line-height:1.15">通知から<br>1 杯を記録できます</div><div style="font-size:14px;margin-top:8px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">飲み会中は通知に経過時間と杯数を表示。アプリを開かずにボタンで記録できます。</div></div>
+        <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);margin:28px 16px 0;padding:14px 14px 12px">
+          
+          <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">alcohol-meter ・ 1:42:18</div>
+          <div style="font-size:14px;margin-top:2px">4 杯 ・ 推定 BAC 0.045%</div>
+          <div style="display:flex;gap:16px;margin-top:10px;font-family:var(--font-heading);font-weight:600;font-size:15px;color:var(--color-accent)"><span>ビール</span><span>ハイボール</span><span>レモン</span></div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="padding:0 16px 24px;display:flex;flex-direction:column;gap:8px"><button class="btn btn-primary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;width:100%;min-height:56px;font-size:18px;color:#09090b;background:var(--color-accent)">通知を許可</button><button class="btn btn-ghost" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;width:100%;min-height:48px;font-size:16px">あとで</button></div>
+      </div>
+      <p class="dv-cap">実際の通知の見本を見せてから許可を求める。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">非対応端末</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#09090b;--color-surface:#18181b;--color-text:#fafafa;--color-divider:#27272a;--color-accent:#fafafa;--color-accent-600:#e4e4e7;--color-accent-700:#d4d4d8;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>12:30</span><span>5G 100%</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 28px 80px">
+          <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);width:72px;height:72px;display:grid;place-items:center;margin-bottom:28px"><svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M12 9v4 M12 17h.01 M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg></div>
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:32px;line-height:1.15">この端末は非対応です</div>
+          <div style="font-size:14px;line-height:1.7;margin-top:12px;color:color-mix(in srgb,var(--color-text) 75%,transparent)">このアプリは、ヘルスコネクトの「飲酒記録」に対応した端末でのみ使えます。</div>
+          <div style="font-size:13px;line-height:1.7;margin-top:16px;padding-top:16px;border-top:1px solid var(--color-divider);color:color-mix(in srgb,var(--color-text) 62%,transparent)">Android 14〜16：ヘルスコネクトの更新が必要です<br>Android 17 以降：標準で対応</div>
+        </div>
+      </div>
+      <p class="dv-cap">説明のみ。操作ボタンは置かない。</p>
+    </div>
+  </div>
+</section>
+
+<section class="dv-turn" id="notify">
+  <div class="dv-thd"><a class="dv-tid" href="#notify">E</a><span class="dv-tname">常駐通知 ・ ライト版</span></div>
+  <div class="dv-opts">
+
+    <div class="dv-opt">
+      <div class="dv-olabel">通知シェード</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:#000000;color:#fafafa;--color-text:#fafafa;--color-divider:rgba(250,250,250,.16);--color-accent:#fafafa">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>20:46</span><span>5G 76%</span></div>
+        <div style="padding:8px 20px 16px;font-size:13px;color:rgba(250,250,250,.62)">11月18日（水）</div>
+        <div style="margin:0 10px;background:#18181b;border-radius:20px;padding:14px 16px 6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(250,250,250,.62)"><span style="width:20px;height:20px;border-radius:50%;background:#fafafa;display:grid;place-items:center;color:#09090b"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.beer }}"></path></svg></span>alcohol-meter ・ 19:04 から</div>
+          <div style="font-size:17px;font-weight:500;margin-top:8px;font-variant-numeric:tabular-nums">飲み会中 1:42:18</div>
+          <div style="font-size:14px;color:rgba(250,250,250,.75)">4 杯 ・ 推定 BAC 0.045%（推定値）</div>
+          <div style="display:flex;gap:4px;margin-top:8px">
+            <sc-for list="{{ notifActions }}" as="n" hint-placeholder-count="3"><span style="white-space:nowrap;min-height:48px;display:flex;align-items:center;gap:6px;padding:0 8px;font-size:14px;font-weight:500;color:#fafafa"><span style="width:8px;height:8px;border-radius:50%;background:{{ n.color }}"></span>{{ n.short }}</span></sc-for>
+          </div>
+        </div>
+        <div style="margin:8px 10px 0;background:#18181b;border-radius:20px;padding:14px 16px 6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(250,250,250,.62)"><span style="width:20px;height:20px;border-radius:50%;background:#fafafa"></span>alcohol-meter ・ 翌 03:14</div>
+          <div style="font-size:17px;font-weight:500;margin-top:8px">お開きしますか？</div>
+          <div style="font-size:14px;color:rgba(250,250,250,.75)">最後の 1 杯（21:14）から 6 時間たちました</div>
+          <div style="display:flex;gap:4px;margin-top:8px"><span style="min-height:48px;display:flex;align-items:center;padding:0 10px;font-size:14px;font-weight:500;color:#fafafa">21:14 でお開き</span><span style="min-height:48px;display:flex;align-items:center;padding:0 10px;font-size:14px;font-weight:500;color:#fafafa">続ける</span></div>
+        </div>
+      </div>
+      <p class="dv-cap">タイトルに Chronometer、本文に杯数と BAC、アクションは設定で選んだ 3 種。下はお開き忘れ通知（参考に同時表示）。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">ライト版 ホーム（開始前）</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#ffffff;--color-surface:#ffffff;--color-text:#09090b;--color-divider:#e4e4e7;--color-accent:#18181b;--color-accent-600:#27272a;--color-accent-700:#18181b;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>18:52</span><span>5G 91%</span></div>
+        <div style="padding:16px 20px 0;flex:none"><div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">今日</div><div style="font-family:var(--font-heading);font-weight:600;font-size:24px">11月18日（水）</div></div>
+        <div style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);margin:16px 16px 0;padding:18px 20px">
+          
+          <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:var(--font-heading);font-weight:600;font-size:96px;line-height:.9;color:var(--color-accent-700)">3</span><span style="font-family:var(--font-heading);font-weight:600;font-size:24px">日連続 休肝日</span></div>
+          <div style="display:flex;gap:20px;margin-top:12px;font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)"><span>最長記録 4 日</span><span>今月の休肝日 12 日</span></div>
+        </div>
+        <div style="padding:24px 20px 8px;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">直近の飲み会</div>
+        <div style="margin:0 16px;display:flex;align-items:center;gap:12px;padding:14px 12px 14px 16px;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden;min-height:64px">
+          <div style="flex:1"><div style="font-family:var(--font-heading);font-weight:600;font-size:18px">11/14（土）</div><div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">19:02–23:40 ・ 7 杯 ・ 114.8 g</div></div>
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg>
+        </div>
+        <div style="flex:1"></div>
+        <div style="padding:0 16px 20px">
+          <div style="text-align:center;font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent);margin-bottom:10px">押した時刻から記録を始めます</div>
+          <button class="btn btn-primary" style="border-radius:14px;font-family:var(--font-body);font-weight:600;white-space:nowrap;flex:none;width:100%;height:112px;gap:14px;font-size:40px;color:#ffffff;background:var(--color-accent-700);border:1px solid var(--color-accent-700);position:relative">
+            
+            <svg viewBox="0 0 24 24" style="width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ I.beer }}"></path></svg>乾杯！
+          </button>
+        </div>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navHomeLight }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">ライトはプライマリを黒（zinc-900）、ダークは白（zinc-50）に反転。</p>
+    </div>
+
+    <div class="dv-opt">
+      <div class="dv-olabel">ライト版 飲み会中（<a class="dv-oid" href="#1b">1b</a>）</div>
+      <div style="width:360px;height:780px;flex:none;border:8px solid #0b0c0d;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);--color-bg:#ffffff;--color-surface:#ffffff;--color-text:#09090b;--color-divider:#e4e4e7;--color-accent:#18181b;--color-accent-600:#27272a;--color-accent-700:#18181b;--font-heading:'Geist','Noto Sans JP',sans-serif;--font-body:'Geist','Noto Sans JP',sans-serif;font-family:var(--font-body)">
+        <div style="height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:500"><span>{{ clock }}</span><span>5G 82%</span></div>
+        <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 20px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent)"></span><span style="font-family:var(--font-heading);font-weight:600;font-size:19px">飲み会中</span><span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ startLabel }} 〜</span></div>
+          <button class="btn btn-secondary" style="border-radius:10px;font-family:var(--font-body);font-weight:500;white-space:nowrap;flex:none;min-height:48px;padding:0 18px;font-size:16px;color:inherit">お開き</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1.25fr 1fr 1.15fr;margin:0 16px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);flex:none">
+          <div style="padding:10px 0"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">経過</div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums">{{ elapsed }}</div></div>
+          <div style="padding:10px 0 10px 12px;border-left:1px solid var(--color-divider)"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">杯数</div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;display:inline-block;transform-origin:left bottom;transition:transform .18s;transform:scale({{ b.scale }})">{{ b.cups }}<span style="font-size:15px;font-weight:400"> 杯</span></div></div>
+          <div style="padding:10px 0 10px 12px;border-left:1px solid var(--color-divider)"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">推定 BAC</div><div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;color:var(--color-accent-700)">{{ b.bac }}<span style="font-size:15px;font-weight:400">%</span></div></div>
+        </div>
+        <div style="padding:6px 16px 0;font-size:11px;color:color-mix(in srgb,var(--color-text) 62%,transparent);flex:none">純アルコール {{ b.g }} g ・ 推定値です。運転してよいかの判断には使えません</div>
+        <div style="padding:14px 16px 0;flex:none">
+          <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent);margin-bottom:6px">最近の 3 杯</div>
+          <sc-for list="{{ b.recent }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;height:26px;font-size:14px"><span style="width:10px;height:10px;border-radius:50%;background:{{ r.colorLight }}"></span><span style="font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--color-text) 62%,transparent);width:44px">{{ r.time }}</span><span>{{ r.name }}</span></div>
+          </sc-for>
+        </div>
+        <div style="flex:1"></div>
+        <div style="padding:0 16px 12px">
+          <button onClick="{{ b.again }}" aria-label="{{ b.againAria }}" class="btn btn-primary" style="border-radius:14px;font-family:var(--font-body);font-weight:600;white-space:nowrap;flex:none;width:100%;height:112px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;padding:0 20px;position:relative;color:#ffffff;background:var(--color-accent-700);border:1px solid var(--color-accent-700)" style-active="background:#3f3f46">
+            
+            <span style="font-family:var(--font-body);font-weight:500;font-size:13px">もう 1 杯</span>
+            <span style="display:flex;align-items:center;gap:10px;font-size:30px;line-height:1.1"><svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ b.lastIcon }}"></path></svg>{{ b.lastName }}</span>
+          </button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 16px">
+          <sc-for list="{{ b.drinksLight }}" as="d" hint-placeholder-count="6">
+            <button onClick="{{ d.tap }}" aria-label="{{ d.aria }}" style="border:1px solid var(--color-divider);border-radius:12px;overflow:hidden;background:var(--color-surface);position:relative;height:88px;background:transparent;color:inherit;font:inherit;text-align:left;padding:8px 10px 12px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;border:1px solid var(--color-divider);border-radius:10px;overflow:hidden" style-active="background:rgba(9,9,11,.06)">
+              
+              <div style="display:flex;justify-content:space-between;width:100%"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:{{ d.color }};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ d.icon }}"></path></svg><span style="font-family:var(--font-heading);font-weight:600;font-size:17px">{{ d.countLabel }}</span></div>
+              <div style="font-family:var(--font-heading);font-weight:600;font-size:15px;line-height:1.1;white-space:nowrap">{{ d.short }}</div>
+              <span style="position:absolute;left:0;right:0;bottom:0;height:3px;background:{{ d.color }}"></span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ b.snack }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:12px;right:12px;bottom:76px;border-radius:12px;background:#fafafa;color:#09090b;box-shadow:0 12px 32px rgba(0,0,0,.5);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px"><span style="flex:1;font-size:14px">{{ b.snackText }}</span><button onClick="{{ b.undo }}" style="min-height:48px;padding:0 14px;background:transparent;border:0;font:600 16px var(--font-heading);color:#09090b;cursor:pointer;text-decoration:underline">取り消し</button></div>
+            <div style="height:3px;background:#09090b;width:{{ b.snackPct }}%"></div>
+          </div>
+        </sc-if>
+        <div style="height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
+          <sc-for list="{{ navHomeLight }}" as="n" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:{{ n.color }}"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="{{ n.icon }}"></path></svg><span>{{ n.label }}</span></div></sc-for>
+        </div>
+      </div>
+      <p class="dv-cap">プリセット色・塗りはライト用に明度を下げた同じ色相（<a class="dv-oid" href="#1b">1b</a> と記録を共有）。</p>
+    </div>
+  </div>
+  <p class="dv-next">次の例: 「ライト版を全画面に」・「お開き後の連携失敗の状態も」・「お開き忘れ通知から開いた時の画面」</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const IC = {
+  beer: "M17 11h1a3 3 0 0 1 0 6h-1 M9 12v6 M13 12v6 M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8",
+  glass: "M5.116 4.104A1 1 0 0 1 6.11 3h11.78a1 1 0 0 1 .994 1.105L17.19 20.21A2 2 0 0 1 15.2 22H8.8a2 2 0 0 1-2-1.79z M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0",
+  sake: "M8 2h8 M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2 M7 15a6.472 6.472 0 0 1 5 0 6.47 6.47 0 0 0 5 0",
+  wine: "M8 22h8 M7 10h10 M12 15v7 M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z",
+  citrus: "M21.66 17.67a1.08 1.08 0 0 1-.04 1.6A12 12 0 0 1 4.73 2.38a1.1 1.1 0 0 1 1.61-.04z M19.65 15.66A8 8 0 0 1 8.35 4.34 M14 10l-5.5 5.5 M14 17.85V10H6.15",
+  rock: "M5 7h14l-1.6 13.2A2 2 0 0 1 15.4 22H8.6a2 2 0 0 1-2-1.8z M9.5 12h4v4h-4z",
+  home: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8 M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+  history: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5 M12 7v5l4 2",
+  calendar: "M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
+  settings: "M21 4h-7 M10 4H3 M21 12h-9 M8 12H3 M21 20h-5 M12 20H3 M14 2v4 M8 10v4 M16 18v4",
+  pencil: "M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",
+  trash: "M3 6h18 M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6 M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2",
+  bell: "M10.268 21a2 2 0 0 0 3.464 0 M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326",
+  pulse: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
+};
+const P = [
+  { id: "beer", name: "ビール", short: "ビール", full: "ビール（中ジョッキ）", ml: 350, abv: 5, hue: 75, c: 0.13, icon: IC.beer, notif: true },
+  { id: "hb", name: "ハイボール", short: "ハイボール", full: "ハイボール", ml: 350, abv: 7, hue: 215, c: 0.09, icon: IC.glass, notif: true },
+  { id: "sake", name: "日本酒", short: "日本酒", full: "日本酒（1合）", ml: 180, abv: 15, hue: 260, c: 0.05, icon: IC.sake },
+  { id: "wine", name: "ワイン", short: "ワイン", full: "ワイン（グラス）", ml: 120, abv: 12, hue: 15, c: 0.15, icon: IC.wine },
+  { id: "lemon", name: "レモンサワー", short: "レモン", full: "レモンサワー", ml: 350, abv: 5, hue: 110, c: 0.14, icon: IC.citrus, notif: true },
+  { id: "shochu", name: "焼酎ロック", short: "焼酎", full: "焼酎ロック", ml: 60, abv: 25, hue: 300, c: 0.09, icon: IC.rock }
+].map(p => ({ ...p, g: p.ml * p.abv / 100 * 0.8, color: `oklch(0.80 ${p.c} ${p.hue})`, colorLight: `oklch(0.55 ${p.c} ${p.hue})` }));
+const byId = Object.fromEntries(P.map(p => [p.id, p]));
+const WEIGHT = 65, R = 0.68, BETA = 0.015;
+const pad = n => String(n).padStart(2, "0");
+const hhmm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+// logs: [{g, t(hours)}] sorted; returns BAC at time t
+function bacAt(logs, t) {
+  let bac = 0, prev = null;
+  for (const l of logs) {
+    if (l.t > t) break;
+    if (prev !== null) bac = Math.max(0, bac - BETA * (l.t - prev));
+    bac += l.g / (WEIGHT * R * 10); prev = l.t;
+  }
+  if (prev === null) return 0;
+  return Math.max(0, bac - BETA * (t - prev));
+}
+function soberAt(logs) {
+  if (!logs.length) return null;
+  const last = logs[logs.length - 1].t;
+  return last + bacAt(logs, last) / BETA;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const now = Date.now();
+    const start = now - 102 * 60000;
+    const seed = () => [["beer", 5], ["beer", 35], ["hb", 70], ["lemon", 95]].map(([id, m]) => ({ id, at: start + m * 60000 }));
+    this.start = start;
+    this.state = { logs: { a: seed(), b: seed(), c: seed() }, snack: null, bump: null };
+    this.summary = this.buildSummary();
+  }
+  componentDidMount() { this.timer = setInterval(() => this.forceUpdate(), 250); }
+  componentWillUnmount() { clearInterval(this.timer); }
+  add(v, id) {
+    try { navigator.vibrate && navigator.vibrate(30); } catch (e) {}
+    const now = Date.now();
+    this.setState(s => {
+      const logs = { ...s.logs, [v]: [...s.logs[v], { id, at: now }] };
+      return { logs, snack: { v, text: `${byId[id].full}を記録（${logs[v].length}杯目）`, at: now }, bump: { v, at: now } };
+    });
+  }
+  undo(v) {
+    this.setState(s => ({ logs: { ...s.logs, [v]: s.logs[v].slice(0, -1) }, snack: null }));
+  }
+  variant(v, now) {
+    const logs = this.state.logs[v];
+    const hl = logs.map(l => ({ g: byId[l.id].g, t: (l.at - this.start) / 3.6e6 }));
+    const tNow = (now - this.start) / 3.6e6;
+    const bac = bacAt(hl, tNow);
+    const sober = hl.length ? new Date(now + (bac / BETA) * 3.6e6) : null;
+    const counts = {}; logs.forEach(l => counts[l.id] = (counts[l.id] || 0) + 1);
+    const sn = this.state.snack, snackOn = sn && sn.v === v && now - sn.at < 5000;
+    const bm = this.state.bump, bumping = bm && bm.v === v && now - bm.at < 220;
+    const last = byId[(logs[logs.length - 1] || { id: "beer" }).id];
+    const mk = light => P.map(p => ({ ...p, color: light ? p.colorLight : p.color, count: counts[p.id] || 0, countLabel: counts[p.id] ? "×" + counts[p.id] : "", spec: `${p.ml} ml ・ ${p.abv}%`, tap: () => this.add(v, p.id), aria: `${p.full}を1杯記録` }));
+    return {
+      cups: logs.length, g: hl.reduce((a, l) => a + l.g, 0).toFixed(1), bac: bac.toFixed(3),
+      sober: bac > 0 ? hhmm(sober) : "—", scale: bumping ? 1.25 : 1,
+      drinks: mk(false), drinksLight: mk(true),
+      snack: !!snackOn, snackText: snackOn ? sn.text : "", snackPct: snackOn ? Math.max(0, 100 - (now - sn.at) / 50) : 0,
+      undo: () => this.undo(v),
+      again: () => this.add(v, last.id), lastName: last.full, lastIcon: last.icon, againAria: `${last.full}をもう1杯記録`,
+      recent: logs.slice(-3).reverse().map(l => ({ time: hhmm(new Date(l.at)), name: byId[l.id].full, color: byId[l.id].color, colorLight: byId[l.id].colorLight }))
+    };
+  }
+  buildSummary() {
+    const s0 = 19 * 60 + 4;
+    const raw = [["beer", 4], ["beer", 37], ["hb", 71], ["lemon", 108], ["sake", 130]];
+    const logs = raw.map(([id, m]) => ({ g: byId[id].g, t: m / 60, id, m }));
+    const sober = soberAt(logs);
+    const W = 300, H = 105, tMax = sober;
+    let peak = 0; const pts = [];
+    for (let t = logs[0].t; t <= tMax + 0.001; t += 5 / 60) { const b = bacAt(logs, t); peak = Math.max(peak, b); pts.push([t, b]); }
+    pts.push([tMax, 0]);
+    const yMax = Math.ceil(peak * 100) / 100 + 0.01;
+    const X = t => (t / tMax * W).toFixed(1), Y = b => (110 - b / yMax * H).toFixed(1);
+    const line = pts.map(([t, b]) => `${X(t)},${Y(b)}`).join(" ");
+    const ticks = [];
+    for (let h = 20; h * 60 - s0 <= tMax * 60; h += 2) ticks.push({ x: X((h * 60 - s0) / 60), label: `${pad(h % 24)}:00` });
+    const fmt = m => { const v = s0 + m; return `${pad(Math.floor(v / 60) % 24)}:${pad(v % 60)}`; };
+    const total = logs.reduce((a, l) => a + l.g, 0);
+    const counts = {}; raw.forEach(([id]) => counts[id] = (counts[id] || 0) + 1);
+    return {
+      stats: [{ k: "開始", v: "19:04" }, { k: "終了", v: "21:46" }, { k: "所要時間", v: "2時間42分" }, { k: "純アルコール", v: total.toFixed(1) + " g" }],
+      byType: Object.keys(counts).map(id => ({ label: `${byId[id].name} ${counts[id]}`, color: byId[id].color })),
+      line, area: `0,110 ${line} ${X(tMax)},110`, peak: peak.toFixed(3),
+      dots: logs.map(l => ({ x: X(l.t), color: byId[l.id].color })), ticks,
+      sober: fmt(Math.round(sober * 60)),
+      logs: logs.map(l => ({ time: fmt(l.m), name: byId[l.id].full, color: byId[l.id].color, g: l.g.toFixed(1) }))
+    };
+  }
+  nav(active, light) {
+    const items = [["ホーム", IC.home], ["履歴", IC.history], ["カレンダー", IC.calendar], ["設定", IC.settings]];
+    return items.map(([label, icon], i) => ({ label, icon, color: i === active ? (light ? "var(--color-accent-700)" : "var(--color-accent)") : "color-mix(in srgb,var(--color-text) 62%,transparent)" }));
+  }
+  renderVals() {
+    const now = Date.now();
+    const el = Math.floor((now - this.start) / 1000);
+    const elapsed = `${Math.floor(el / 3600)}:${pad(Math.floor(el / 60) % 60)}:${pad(el % 60)}`;
+    const drinkDays = [1, 6, 7, 11, 14];
+    const cal = Array.from({ length: 30 }, (_, i) => {
+      const d = i + 1, drank = drinkDays.includes(d), past = d < 18, today = d === 18;
+      return {
+        d, bg: drank ? "transparent" : past ? "rgba(250,250,250,.16)" : "transparent",
+        fg: drank ? "#fafafa" : past ? "#d4d4d8" : today ? "#fafafa" : "rgba(250,250,250,.4)",
+        ol: today ? "1px solid #fafafa" : "none", dot: drank ? "#fafafa" : "transparent"
+      };
+    });
+    const hRows = [
+      ["11/14", "土", "19:02–23:40", "7 杯 ・ 114.8 g", "ok"],
+      ["11/11", "水", "20:15–22:30", "3 杯 ・ 49.6 g", "ok"],
+      ["11/07", "土", "18:30–22:10", "6 杯 ・ 96.0 g", "ok"],
+      ["11/06", "金", "19:40–21:05", "2 杯 ・ 28.0 g", "fail"],
+      ["11/01", "日", "17:30–20:00", "3 杯 ・ 26.1 g", "ok"]
+    ];
+    const history = [{ isHeader: true, label: "2026年 11月" }].concat(hRows.map(([date, dow, range, meta, st]) => ({
+      isRow: true, date, dow, range, meta,
+      tag: st === "ok" ? "送信済み" : "送信失敗",
+      tagBorder: st === "ok" ? "rgba(250,250,250,.16)" : "#fafafa",
+      tagColor: st === "ok" ? "rgba(250,250,250,.62)" : "#e4e4e7"
+    }))).concat([{ isHeader: true, label: "2026年 10月" }, { isRow: true, date: "10/30", dow: "金", range: "19:00–22:45", meta: "5 杯 ・ 80.4 g", tag: "送信済み", tagBorder: "rgba(250,250,250,.16)", tagColor: "rgba(250,250,250,.62)" }]);
+    const det = [["19:05", "beer"], ["19:30", "beer"], ["20:02", "hb"], ["20:52", "hb"], ["21:30", "sake"], ["22:15", "lemon"], ["23:10", "shochu"]];
+    return {
+      I: IC, clock: hhmm(new Date(now)), startLabel: hhmm(new Date(this.start)), elapsed,
+      a: this.variant("a", now), b: this.variant("b", now), c: this.variant("c", now),
+      sum: this.summary,
+      navHome: this.nav(0), navHist: this.nav(1), navCal: this.nav(2), navSet: this.nav(3), navHomeLight: this.nav(0, true),
+      history,
+      detail: det.map(([time, id], i) => ({ time, name: byId[id].full, color: byId[id].color, bg: i === 3 ? "rgba(250,250,250,.08)" : "transparent" })),
+      editChips: P.map(p => ({ short: p.short, color: p.color, border: p.id === "hb" ? "#fafafa" : "rgba(250,250,250,.16)", bg: p.id === "hb" ? "rgba(250,250,250,.1)" : "transparent" })),
+      dows: ["日", "月", "火", "水", "木", "金", "土"], cal,
+      calStats: [
+        { k: "連続 休肝日", v: "3", u: "日", color: "#fafafa" }, { k: "最長記録", v: "4", u: "日", color: "#fafafa" },
+        { k: "今月の休肝日 / 飲んだ日", v: "12 / 5", u: "日", color: "#fafafa" }, { k: "純アルコール（1日平均）", v: "314.5", u: "g（18.5）", color: "#fafafa" }
+      ],
+      presetRows: P.map(p => ({ name: p.full, icon: p.icon, color: p.color, spec: `${p.ml}ml ${p.abv}%`, bell: p.notif ? "#fafafa" : "rgba(250,250,250,.25)" })),
+      settingRows: [{ k: "体重", v: "65.0 kg" }, { k: "性別", v: "男性" }, { k: "分解速度", v: "0.015 %/時" }, { k: "ヘルスコネクト", v: "許可済み" }, { k: "日付の区切り", v: "AM 3:00（固定）" }],
+      swatches: P.map(p => ({ color: p.color, ol: p.id === "hb" ? "2px solid #fafafa" : "none" })),
+      notifActions: P.filter(p => p.notif).map(p => ({ short: p.short, color: p.color }))
+    };
+  }
+}
+</script>
+</body>
+</html>
