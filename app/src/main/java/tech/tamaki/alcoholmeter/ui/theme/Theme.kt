@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
-private val DarkScheme = darkColorScheme(primary=DarkOnSurface, onPrimary=DarkBackground, background=DarkBackground, onBackground=DarkOnSurface, surface=DarkSurface, onSurface=DarkOnSurface, outline=DarkDivider, secondary=DarkSecondary)
-private val LightScheme = lightColorScheme(primary=LightPrimary, onPrimary=Color.White, background=LightBackground, onBackground=LightOnSurface, surface=LightBackground, onSurface=LightOnSurface, outline=LightDivider, secondary=LightMuted)
+private val DarkScheme = darkColorScheme(primary=DarkOnSurface, onPrimary=DarkBackground, background=DarkBackground, onBackground=DarkOnSurface, surface=DarkSurface, onSurface=DarkOnSurface, outline=DarkDivider, secondary=DarkSecondary, tertiary=DarkRestDay)
+private val LightScheme = lightColorScheme(primary=LightPrimary, onPrimary=Color.White, background=LightBackground, onBackground=LightOnSurface, surface=LightBackground, onSurface=LightOnSurface, outline=LightDivider, secondary=LightMuted, tertiary=LightRestDay)
 
 @Composable
 fun AlcoholMeterTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
