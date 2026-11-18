@@ -27,6 +27,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.background
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavGraphBuilder
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -71,8 +78,17 @@ private fun MainNavigation(openEndDialog: Boolean, onEndDialogOpened: () -> Unit
     val current = nav.currentBackStackEntryAsState().value?.destination?.route ?: "home"
     LaunchedEffect(openEndDialog, current) { if (openEndDialog && current != "home") nav.navigate("home") { launchSingleTop = true } }
     Column(Modifier.fillMaxSize()) {
-        NavHost(navController = nav, startDestination = "home", modifier = Modifier.weight(1f)) {
-            composable("home") {
+        NavHost(
+            navController = nav,
+            startDestination = "home",
+            modifier = Modifier.weight(1f),
+            // 画面切り替えは即時（フェード等のモーションなし）
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None },
+        ) {
+            screen("home") {
                 val vm: HomeViewModel = hiltViewModel()
                 val state by vm.uiState.collectAsState()
                 when (val home = state) {
@@ -86,27 +102,27 @@ private fun MainNavigation(openEndDialog: Boolean, onEndDialogOpened: () -> Unit
                     is HomeState.Finished -> LaunchedEffect(home.sessionId) { nav.navigate("summary/${home.sessionId}") { launchSingleTop = true } }
                 }
             }
-            composable("summary/{sessionId}") {
+            screen("summary/{sessionId}") {
                 val vm: SummaryViewModel = hiltViewModel()
                 val state by vm.uiState.collectAsState()
                 state?.let { SessionSummaryScreen(it, { vm.closeSummary { nav.navigate("home") { popUpTo("home") { inclusive = true }; launchSingleTop = true } } }, vm::retry, { nav.navigate("settings") }) }
             }
-            composable("history") {
+            screen("history") {
                 val vm: HistoryListViewModel = hiltViewModel()
                 val state by vm.uiState.collectAsState()
                 HistoryListScreen(state, { nav.navigate("detail/${it.id}") }, { vm.retry(it.id) })
             }
-            composable("detail/{sessionId}") {
+            screen("detail/{sessionId}") {
                 val vm: HistoryDetailViewModel = hiltViewModel()
                 val state by vm.uiState.collectAsState()
                 state?.let { HistoryDetailScreen(it, { nav.popBackStack() }, vm::edit, vm::save, vm::deleteDrink, { vm.deleteSession { nav.popBackStack() } }, vm::retry, { nav.navigate("settings") }, vm::cancelEdit) }
             }
-            composable("calendar") {
+            screen("calendar") {
                 val vm: CalendarViewModel = hiltViewModel()
                 val state by vm.uiState.collectAsState()
                 CalendarScreen(state, vm::selectMonth) { date -> vm.sessionForDay(date)?.let { nav.navigate("detail/$it") } }
             }
-            composable("settings") {
+            screen("settings") {
                 val vm: SettingsViewModel = hiltViewModel()
                 val state by vm.uiState.collectAsState()
                 val profile by vm.profile.collectAsState()
@@ -116,7 +132,7 @@ private fun MainNavigation(openEndDialog: Boolean, onEndDialogOpened: () -> Unit
                 SettingsScreen(state, { nav.navigate("preset/${it.id}") }, { nav.navigate("preset/0") }, vm::move, { editing = true }, { launcher.launch(vm.permissions) })
                 if (editing && profile != null) ProfileDialog(profile!!, { vm.updateProfile(it); editing = false }, { editing = false })
             }
-            composable("preset/{presetId}", arguments = listOf(navArgument("presetId") { type = NavType.LongType })) {
+            screen("preset/{presetId}", arguments = listOf(navArgument("presetId") { type = NavType.LongType })) {
                 val vm: PresetEditorViewModel = hiltViewModel()
                 val state by vm.uiState.collectAsState()
                 PresetEditorScreen(state.first, state.second, vm::edit, { vm.save { nav.popBackStack() } }, { nav.popBackStack() })
@@ -145,4 +161,18 @@ private fun ProfileDialog(profile: UserProfile, save: (UserProfile) -> Unit, dis
             }
         }
     }, confirmButton = { TextButton(onClick = { if (valid) save(UserProfile(parsedWeight!!, sex, parsedRate!!)) }, enabled = valid) { Text(stringResource(R.string.save)) } }, dismissButton = { TextButton(onClick = dismiss) { Text(stringResource(R.string.cancel)) } })
+}
+
+/**
+ * 背景色を敷いた画面。遷移アニメーションを無効にしていても、切り替えの瞬間に新旧の画面が
+ * 1〜数フレーム同時に描かれるため、背景を不透明にして新しい画面で古い画面を完全に隠す。
+ */
+private fun NavGraphBuilder.screen(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    content: @Composable (NavBackStackEntry) -> Unit,
+) {
+    composable(route, arguments) { entry ->
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { content(entry) }
+    }
 }
