@@ -43,7 +43,7 @@ fun CalendarScreen(state: CalendarUiState, onMonthChange: (YearMonth) -> Unit, o
             Text(stringResource(R.string.calendar_month_title, state.month.year, state.month.monthValue), Modifier.weight(1f), fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
             AppButton("", { onMonthChange(state.month.minusMonths(1)) }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_chevron_left, iconContentDescription = stringResource(R.string.calendar_previous_month))
             val canAdvance = state.month < todayMonth
-            AppButton("", { if (canAdvance) onMonthChange(state.month.plusMonths(1)) }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_chevron_right, iconContentDescription = stringResource(R.string.calendar_next_month), contentDescription = if (canAdvance) null else stringResource(R.string.calendar_next_month_disabled), enabled = canAdvance, iconAlpha = if (canAdvance) 1f else 0.35f)
+            AppButton("", { if (canAdvance) onMonthChange(state.month.plusMonths(1)) }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_chevron_right, iconContentDescription = stringResource(R.string.calendar_next_month), contentDescription = if (canAdvance) null else stringResource(R.string.calendar_next_month_disabled), enabled = canAdvance)
         }
         Row(Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp)) {
             val weekdays = listOf(R.string.weekday_sunday, R.string.weekday_monday, R.string.weekday_tuesday, R.string.weekday_wednesday, R.string.weekday_thursday, R.string.weekday_friday, R.string.weekday_saturday)

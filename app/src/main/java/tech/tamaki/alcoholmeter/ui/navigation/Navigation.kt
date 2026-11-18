@@ -20,6 +20,16 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import tech.tamaki.alcoholmeter.ui.components.AppButton
+import tech.tamaki.alcoholmeter.ui.components.AppButtonStyle
 import tech.tamaki.alcoholmeter.domain.model.UserProfile
 import tech.tamaki.alcoholmeter.domain.model.Sex
 import androidx.compose.ui.Modifier
@@ -153,12 +163,17 @@ private fun ProfileDialog(profile: UserProfile, save: (UserProfile) -> Unit, dis
     val parsedRate = rate.toDoubleOrNull()
     val valid = parsedWeight != null && parsedWeight.isFinite() && parsedWeight > 0 && parsedRate != null && parsedRate.isFinite() && parsedRate > 0
     AlertDialog(onDismissRequest = dismiss, title = { Text(stringResource(R.string.settings_bac_calculation)) }, text = {
-        Column {
-            OutlinedTextField(weight, { weight = it }, label = { Text(stringResource(R.string.settings_weight)) })
-            OutlinedTextField(rate, { rate = it }, label = { Text(stringResource(R.string.settings_elimination_rate)) })
-            TextButton(onClick = { sex = if (sex == Sex.MALE) Sex.FEMALE else Sex.MALE }) {
-                Text(stringResource(if (sex == Sex.MALE) R.string.onboarding_male else R.string.onboarding_female))
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // 数値は数字キーボードで入力し、単位を常に表示する
+            OutlinedTextField(weight, { weight = it }, label = { Text(stringResource(R.string.settings_weight)) }, suffix = { Text(stringResource(R.string.unit_kg)) }, singleLine = true, isError = parsedWeight == null || parsedWeight <= 0, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
+            // 性別はトグルの文字ではなく、選択中が分かる 2 択にする
+            Text(stringResource(R.string.settings_sex), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(Sex.MALE to R.string.onboarding_male, Sex.FEMALE to R.string.onboarding_female).forEach { (value, label) ->
+                    AppButton(stringResource(label), { sex = value }, Modifier.weight(1f).semantics { selected = sex == value }, if (sex == value) AppButtonStyle.Primary else AppButtonStyle.Secondary, 48.dp)
+                }
             }
+            OutlinedTextField(rate, { rate = it }, label = { Text(stringResource(R.string.settings_elimination_rate)) }, suffix = { Text(stringResource(R.string.unit_bac_per_hour)) }, singleLine = true, isError = parsedRate == null || parsedRate <= 0, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
         }
     }, confirmButton = { TextButton(onClick = { if (valid) save(UserProfile(parsedWeight!!, sex, parsedRate!!)) }, enabled = valid) { Text(stringResource(R.string.save)) } }, dismissButton = { TextButton(onClick = dismiss) { Text(stringResource(R.string.cancel)) } })
 }

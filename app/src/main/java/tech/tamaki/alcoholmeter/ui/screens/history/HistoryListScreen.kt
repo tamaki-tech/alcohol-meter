@@ -36,6 +36,10 @@ fun HistoryListScreen(
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(top = 16.dp, bottom = 16.dp)) {
         Text(stringResource(R.string.nav_history), Modifier.padding(horizontal = 16.dp), fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
+        // 記録が無いときは、何をすれば記録が増えるかを案内する（読み込み中は出さない）
+        if (state.loaded && state.sessions.isEmpty()) {
+            Text(stringResource(R.string.history_empty), Modifier.padding(horizontal = 16.dp, vertical = 24.dp), fontSize = 14.sp, color = MaterialTheme.colorScheme.secondary)
+        }
         state.sessions.groupBy { it.monthHeading }.forEach { (month, sessions) ->
             Text(month, Modifier.padding(start = 16.dp, top = 20.dp, bottom = 4.dp), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary, letterSpacing = 0.7.sp)
             sessions.forEach { session ->

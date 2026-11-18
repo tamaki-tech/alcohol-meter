@@ -61,8 +61,13 @@
     <string name="history_not_linked">未連携</string>
     <string name="history_back">戻る</string>
     <string name="history_menu">メニュー</string>
+    <string name="history_empty">まだ飲み会の記録はありません。ホームの「乾杯！」から記録を始められます。</string>
     <string name="history_edit_drink">1 杯を編集</string>
+    <string name="history_edit_drink_named">%1$sを編集</string>
+    <string name="summary_drink_order">飲んだ順</string>
     <string name="history_delete_session_question">この飲み会を削除しますか？</string>
+    <string name="history_delete_session">この飲み会を削除</string>
+    <string name="history_delete_drink_question">この 1 杯を削除しますか？</string>
     <string name="history_detail_overview">%1$s–%2$s ・ %3$d 杯 ・ %4$s</string>
     <string name="history_time_value">%1$s　%2$s</string>
     <string name="history_choose_time">日時を選ぶ</string>
@@ -103,6 +108,20 @@
     <string name="preset_abv">度数 %</string>
     <string name="preset_beverage_type">種類</string>
     <string name="preset_color">色</string>
+    <string name="beverage_beer">ビール</string>
+    <string name="beverage_highball">ハイボール</string>
+    <string name="beverage_sake">日本酒</string>
+    <string name="beverage_shochu">焼酎</string>
+    <string name="beverage_wine">ワイン</string>
+    <string name="beverage_chuhai">チューハイ</string>
+    <string name="beverage_cocktail">カクテル</string>
+    <string name="beverage_whiskey">ウイスキー</string>
+    <string name="beverage_other">その他</string>
+    <string name="preset_color_option">色 %1$d</string>
+    <string name="preset_save_disabled">保存（入力内容を確認してください）</string>
+    <string name="preset_error_name">名前を入力してください</string>
+    <string name="preset_error_volume">0 より大きい数で入力してください</string>
+    <string name="preset_error_abv">0〜100 の数で入力してください</string>
     <string name="unit_ml">ml</string>
     <string name="preset_notification_max">最大 3 件</string>
     <string name="preset_notification_limit_reason">通知に出せるプリセットは3件までです。先に別のプリセットをOFFにしてください。</string>
@@ -111,6 +130,7 @@
     <string name="onboarding_weight_subtitle">推定 BAC の計算に使います</string>
     <string name="onboarding_weight_source">ヘルスコネクトの最新値（%1$s）を入れています</string>
     <string name="unit_kg">kg</string>
+    <string name="unit_bac_per_hour" formatted="false">%/時</string>
     <string name="onboarding_male">男性</string>
     <string name="onboarding_female">女性</string>
     <string name="onboarding_next">次へ</string>

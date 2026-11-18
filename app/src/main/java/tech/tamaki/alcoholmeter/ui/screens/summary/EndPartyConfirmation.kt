@@ -1,8 +1,11 @@
 package tech.tamaki.alcoholmeter.ui.screens.summary
 
+import androidx.activity.compose.BackHandler
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,9 +48,13 @@ fun EndPartyConfirmation(
     onDismiss: () -> Unit,
 ) {
     var choice by remember(state.initialSelection) { mutableStateOf(state.initialSelection) }
-    Box(Modifier.fillMaxSize().background(Color(0xB8050607))) {
+    // 戻る操作はダイアログを閉じる（アプリを閉じない）
+    BackHandler(onBack = onDismiss)
+    // scrim はタップを受け止めて下の画面に通さない（通すと裏のドリンクボタンで 1 杯記録されてしまう）。タップで「まだ飲む」と同じく閉じる
+    Box(Modifier.fillMaxSize().background(Color(0xB8050607)).pointerInput(onDismiss) { detectTapGestures(onTap = { onDismiss() }) }) {
         Column(
             Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 16.dp, vertical = 24.dp)
+                .pointerInput(Unit) { detectTapGestures { } }
                 .clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surface)
                 .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp)).padding(20.dp),
         ) {

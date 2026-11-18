@@ -28,6 +28,6 @@ class HistoryListViewModel @Inject constructor(data: ObservePartyData, clock: Cl
     val uiState = combine(data.history(), permissions.writeGranted) { sessions, granted -> HistoryListUiState(sessions.map { item ->
         val date = item.session.startedAt.atZone(clock.zone).toLocalDate()
         HistorySessionUiState(item.session.id, context.getString(R.string.vm_month_heading, date.year, date.monthValue), date.format(DateTimeFormatter.ofPattern("MM/dd", Locale.JAPAN)), date.format(DateTimeFormatter.ofPattern("E", Locale.JAPAN)), "${formatTime(item.session.startedAt, clock.zone)}–${item.session.endedAt?.let { formatTime(it, clock.zone) } ?: "—"}", context.getString(R.string.vm_history_details, item.logs.size, formatGrams(item.logs.sumOf { it.pureAlcoholG })), if (!granted) HistorySyncStatus.NotLinked else when (item.session.hcSyncStatus) { HcSyncStatus.SYNCED -> HistorySyncStatus.Sent; HcSyncStatus.FAILED -> HistorySyncStatus.Failed; HcSyncStatus.NOT_SYNCED -> HistorySyncStatus.NotLinked })
-    }) }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryListUiState(emptyList()))
+    }) }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryListUiState(emptyList(), loaded = false))
     fun retry(id: String) = sync(id)
 }

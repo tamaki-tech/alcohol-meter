@@ -3,15 +3,20 @@ package tech.tamaki.alcoholmeter.ui.screens.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -51,8 +56,11 @@ fun HomeInPartyScreen(
     val haptics = LocalHapticFeedback.current
     val lastPreset = state.presets.firstOrNull { it.id == state.lastPresetId }
         ?: state.presets.firstOrNull()
-    Box(Modifier.fillMaxSize()) {
+    // 横向きなど高さが足りないときは、画面全体を縦スクロールにしてドリンクボタンが潰れないようにする
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+      val compact = maxHeight < 600.dp
       Column(Modifier.fillMaxSize()) {
+        // ヘッダー（「お開き」を含む）はスクロールさせない
         Row(
             Modifier.fillMaxWidth().height(56.dp).padding(start = 20.dp, end = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -72,6 +80,7 @@ fun HomeInPartyScreen(
             )
             SecondaryButton(stringResource(R.string.end_party), onEndParty, Modifier.height(48.dp))
         }
+        Column(Modifier.fillMaxWidth().weight(1f).then(if (compact) Modifier.verticalScroll(rememberScrollState()) else Modifier)) {
         MetricStrip(
             elapsed = MetricValue(stringResource(R.string.metric_elapsed), state.elapsed),
             cups = MetricValue(stringResource(R.string.metric_cups), state.cups.toString(), stringResource(R.string.unit_cups)),
@@ -94,21 +103,32 @@ fun HomeInPartyScreen(
         )
         state.recentDrinks.take(3).forEach { drink ->
             Row(
-                Modifier.fillMaxWidth().height(26.dp).padding(horizontal = 16.dp),
+                // 文字を大きくしても行が切れないよう、高さ・時刻の幅は最小値として指定する
+                Modifier.fillMaxWidth().heightIn(min = 26.dp).padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 DrinkColorDot(drink.colorIndex)
                 Text(
                     drink.time,
-                    Modifier.padding(start = 8.dp).width(44.dp),
+                    Modifier.padding(start = 8.dp).widthIn(min = 44.dp),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.secondary,
                     fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                 )
-                Text(drink.name, fontSize = 14.sp, maxLines = 1)
+                Text(drink.name, Modifier.padding(start = 4.dp), fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             }
         }
-        Spacer(Modifier.weight(1f))
+        // 取り消しスナックバーは余白の下端（もう 1 杯ボタンの真上）に重ねる。
+        // ドリンクボタンの上に重ねると、5 秒以内に次の 1 杯を押したつもりで「取り消し」を押してしまうため
+        if (compact) {
+            Spacer(Modifier.height(12.dp))
+        } else {
+            Box(Modifier.fillMaxWidth().weight(1f)) {
+                state.undoMessage?.let { message ->
+                    UndoSnackbar(message = message, onUndo = onUndoDrink, modifier = Modifier.align(Alignment.BottomCenter).wrapContentHeight(Alignment.Bottom, unbounded = true).padding(horizontal = 12.dp).padding(bottom = 12.dp), resetKey = message)
+                }
+            }
+        }
         if (lastPreset != null) {
             AppButton(
                 text = stringResource(R.string.home_another_drink, lastPreset.name),
@@ -136,30 +156,50 @@ fun HomeInPartyScreen(
                 contentDescription = stringResource(R.string.home_another_drink_accessibility, lastPreset.name),
             )
         }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(state.presets, key = { it.id }) { preset ->
-                DrinkButton(
-                    name = preset.name,
-                    shortName = preset.shortName,
-                    count = state.drinkCounts[preset.id] ?: 0,
-                    colorIndex = preset.colorIndex,
-                    icon = iconResource(preset.icon),
-                    onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onRecordDrink(preset)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+        val drinkButton: @Composable (DrinkPreset, Modifier) -> Unit = { preset, modifier ->
+            DrinkButton(
+                name = preset.name,
+                shortName = preset.shortName,
+                count = state.drinkCounts[preset.id] ?: 0,
+                colorIndex = preset.colorIndex,
+                icon = iconResource(preset.icon),
+                onClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onRecordDrink(preset)
+                },
+                modifier = modifier,
+            )
+        }
+        if (compact) {
+            // 画面全体がスクロールするので、グリッドは通常の行として並べる
+            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                state.presets.chunked(3).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        row.forEach { preset -> drinkButton(preset, Modifier.weight(1f)) }
+                        repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                    }
+                }
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                // グリッドは中身の高さを先に確保し、余白は上の Box に回す（半分ずつ分けると 2 段目が下端で切れる）。
+                // プリセットが多くて入りきらないときだけスクロールする
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(state.presets, key = { it.id }) { preset -> drinkButton(preset, Modifier.fillMaxWidth()) }
             }
         }
+        }
       }
-      state.undoMessage?.let { message ->
-          UndoSnackbar(message = message, onUndo = onUndoDrink, modifier = Modifier.align(Alignment.BottomCenter).padding(horizontal = 12.dp).padding(bottom = 76.dp), resetKey = message)
+      if (compact) {
+          // スクロール表示では、スクロールしない上部ヘッダーの位置に重ねる（下の内容に重ねると、スクロール位置によって
+          // 「もう 1 杯」やドリンクボタンにかぶる）。5 秒間「お開き」が隠れるが、記録直後にお開きすることは少ない
+          state.undoMessage?.let { message ->
+              UndoSnackbar(message = message, onUndo = onUndoDrink, modifier = Modifier.align(Alignment.TopCenter).padding(horizontal = 12.dp).padding(top = 2.dp), resetKey = message)
+          }
       }
     }
 }

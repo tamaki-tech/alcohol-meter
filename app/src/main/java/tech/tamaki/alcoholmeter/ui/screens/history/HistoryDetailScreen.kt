@@ -1,5 +1,14 @@
 package tech.tamaki.alcoholmeter.ui.screens.history
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -77,6 +86,7 @@ fun HistoryDetailScreen(
     onOpenSettings: () -> Unit,
     onCancelEdit: () -> Unit = {},
 ) {
+    var showMenu by remember { mutableStateOf(false) }
     var showSessionDelete by remember { mutableStateOf(false) }
     var showDrinkDelete by remember { mutableStateOf(false) }
     var editState by remember(state.edit) { mutableStateOf(state.edit) }
@@ -84,7 +94,18 @@ fun HistoryDetailScreen(
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             AppButton("", onBack, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_chevron_left, iconContentDescription = stringResource(R.string.history_back))
             Text(state.summary.dateTitle, Modifier.weight(1f), fontSize = 20.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            AppButton("", { showSessionDelete = true }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_ellipsis_vertical, iconContentDescription = stringResource(R.string.history_menu))
+            Box {
+                AppButton("", { showMenu = true }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_ellipsis_vertical, iconContentDescription = stringResource(R.string.history_menu))
+                // メニューのアイコンからいきなり削除確認を出さず、何をするメニューかを見せてから確認する
+                DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.history_delete_session)) },
+                        onClick = { showMenu = false; showSessionDelete = true },
+                        leadingIcon = { Image(painterResource(R.drawable.ic_trash), null, Modifier.size(20.dp), colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)) },
+                        modifier = Modifier.heightIn(min = 48.dp),
+                    )
+                }
+            }
         }
         Text(
             stringResource(R.string.history_detail_overview, state.startTime, state.endTime, state.summary.drinkRows.size, state.summary.metrics.lastOrNull()?.value.orEmpty()),
@@ -93,19 +114,8 @@ fun HistoryDetailScreen(
             color = MaterialTheme.colorScheme.secondary,
         )
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-            SessionSummaryContent(state.summary)
+            SessionSummaryContent(state.summary, onEditDrink)
             SyncStatusCard(state.summary, onRetrySync, onOpenSettings)
-            state.summary.drinkRows.forEach { drink ->
-                Row(
-                    Modifier.fillMaxWidth().height(52.dp).clickable { onEditDrink(drink.id) }.padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(drink.time, Modifier.padding(end = 12.dp), fontSize = 14.sp)
-                    DrinkColorDot(drink.colorIndex)
-                    Text(drink.name, Modifier.weight(1f).padding(start = 10.dp), fontSize = 14.sp)
-                    AppButton("", { onEditDrink(drink.id) }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_pencil, iconContentDescription = stringResource(R.string.history_edit_drink))
-                }
-            }
         }
     }
     editState?.let { edit ->
@@ -114,7 +124,7 @@ fun HistoryDetailScreen(
             editState = edit.copy(time = "%02d:%02d".format(hour, minute), selectedDateTime = selected)
         }
     }
-    if (showDrinkDelete) { ConfirmDeleteDialog(stringResource(R.string.delete), { showDrinkDelete = false; onDeleteDrink() }) { showDrinkDelete = false } }
+    if (showDrinkDelete) { ConfirmDeleteDialog(stringResource(R.string.history_delete_drink_question), { showDrinkDelete = false; onDeleteDrink() }) { showDrinkDelete = false } }
     if (showSessionDelete) {
         ConfirmDeleteDialog(stringResource(R.string.history_delete_session_question), onDeleteSession) { showSessionDelete = false }
     }
@@ -133,9 +143,11 @@ fun EditDrinkBottomSheet(
     var showTimePicker by remember { mutableStateOf(false) }
     val timeParts = state.time.split(":")
     val pickerState = rememberTimePickerState(timeParts.getOrNull(0)?.toIntOrNull() ?: 0, timeParts.getOrNull(1)?.toIntOrNull() ?: 0, is24Hour = true)
-    Box(Modifier.fillMaxSize().background(Color(0x99050607)), contentAlignment = Alignment.BottomCenter) {
+    // 戻る操作・scrim のタップはシートを閉じる（画面ごと戻ったり、裏の行をタップしたりしない）
+    BackHandler(onBack = onCancel)
+    Box(Modifier.fillMaxSize().background(Color(0x99050607)).pointerInput(onCancel) { detectTapGestures(onTap = { onCancel() }) }, contentAlignment = Alignment.BottomCenter) {
         Column(
-            Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface, RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)).padding(horizontal = 20.dp, vertical = 16.dp),
+            Modifier.fillMaxWidth().pointerInput(Unit) { detectTapGestures { } }.background(MaterialTheme.colorScheme.surface, RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)).padding(horizontal = 20.dp, vertical = 16.dp),
         ) {
             Box(Modifier.width(36.dp).height(4.dp).background(MaterialTheme.colorScheme.outline, CircleShape).align(Alignment.CenterHorizontally))
             Text(state.title, Modifier.padding(vertical = 16.dp), fontSize = 22.sp, fontWeight = FontWeight.SemiBold)

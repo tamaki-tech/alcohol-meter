@@ -80,6 +80,7 @@ private fun WeightAndSexStep(state: OnboardingUiState, onWeightChange: (String) 
             singleLine = true,
             textStyle = MaterialTheme.typography.headlineLarge.copy(fontSize = 64.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            cursorBrush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.primary),
         )
         Text(stringResource(R.string.unit_kg), Modifier.padding(bottom = 14.dp), fontSize = 18.sp, color = MaterialTheme.colorScheme.secondary)
     }

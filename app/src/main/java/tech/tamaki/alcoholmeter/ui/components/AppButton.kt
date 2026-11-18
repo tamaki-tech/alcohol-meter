@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -75,12 +76,15 @@ fun AppButton(
         modifier = modifier
             .defaultMinSize(minWidth = 48.dp)
             .height(height)
+            // 無効なボタンは薄く表示し、押せないことを見て分かるようにする
+            .alpha(if (enabled) 1f else 0.38f)
             .clip(shape)
             .background(background)
             .then(if (style == AppButtonStyle.Secondary) Modifier.border(1.dp, MaterialTheme.colorScheme.outline, shape) else Modifier)
             .clickable(interactionSource = interactionSource, indication = null, enabled = enabled, onClick = onClick)
             .then(if (contentDescription != null) Modifier.semantics { this.contentDescription = contentDescription } else Modifier)
-            .padding(horizontal = 18.dp),
+            // アイコンだけのボタンは余白を取らない（48dp から余白を引くとアイコンが縮んでしまう）
+            .padding(horizontal = if (text.isEmpty() && icon != null && content == null) 0.dp else 18.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
@@ -95,9 +99,9 @@ fun AppButton(
                     modifier = Modifier.size(24.dp),
                     colorFilter = ColorFilter.tint(foreground.copy(alpha = iconAlpha)),
                 )
-                Spacer(Modifier.size(8.dp))
+                if (text.isNotEmpty()) Spacer(Modifier.size(8.dp))
             }
-            Text(text, color = foreground, fontSize = if (style == AppButtonStyle.Primary && height == 112.dp) 40.sp else 16.sp)
+            if (text.isNotEmpty()) Text(text, color = foreground, fontSize = if (style == AppButtonStyle.Primary && height == 112.dp) 40.sp else 16.sp)
         }
     }
 }

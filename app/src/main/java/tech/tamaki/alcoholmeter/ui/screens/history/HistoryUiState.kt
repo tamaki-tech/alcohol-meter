@@ -17,7 +17,7 @@ data class HistorySessionUiState(
 
 enum class HistorySyncStatus { Sent, Failed, NotLinked }
 
-data class HistoryListUiState(val sessions: List<HistorySessionUiState>)
+data class HistoryListUiState(val sessions: List<HistorySessionUiState>, val loaded: Boolean = true)
 
 data class HistoryDetailUiState(
     val summary: SummaryUiState,
