@@ -1,0 +1,6 @@
+# Health Connect 調査（2026-11-18）
+
+- 権限は `android.permission.health.READ_ALCOHOL_CONSUMPTION` と `android.permission.health.WRITE_ALCOHOL_CONSUMPTION`。本アプリは飲酒の書き込みのみ要求する。公式の READ の説明文には write と記載されており誤記と思われる。 https://developer.android.com/reference/android/health/connect/HealthPermissions
+- プラットフォームの `AlcoholConsumptionRecord` は API 37 または U Extensions 21。公開 getter と Builder に杯数フィールドは見当たらない。`servingVolume` は一杯あたりの量であり杯数ではない。1杯1レコードとする仕様に適合する。瞬間用 Builder がある。 https://developer.android.com/reference/android/health/connect/datatypes/AlcoholConsumptionRecord https://developer.android.com/reference/android/health/connect/datatypes/AlcoholConsumptionRecord.Builder
+- Jetpack connect-client の対応版は未確認。公式リリースノートの最新版 1.2.0-alpha06 までに当該型の対応を確認できなかったため、対応済みと断定しない。Phase 3 ではプラットフォーム API を検討し、SDK と実機で検証する。 https://developer.android.com/jetpack/androidx/releases/health-connect
+- SDK 自体の状態は `HealthConnectClient.getSdkStatus` で判定できるが、個別記録型の対応を保証しない。API 37 以上または `SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) >= 21` を併用する方針。feature API に当該型専用の判定があることは未確認。API 呼び出しのクラスロードと extension SDK のコンパイル環境を Phase 3 で検証する。 https://developer.android.com/reference/androidx/health/connect/client/HealthConnectClient https://developer.android.com/reference/android/os/ext/SdkExtensions

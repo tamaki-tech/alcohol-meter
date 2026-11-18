@@ -1,0 +1,16 @@
+<resources>
+    <string name="vm_summary_start">開始</string>
+    <string name="vm_summary_end">終了</string>
+    <string name="vm_summary_duration">所要時間</string>
+    <string name="vm_summary_alcohol">純アルコール</string>
+    <string name="vm_history_details">%1$d 杯 ・ %2$s</string>
+    <string name="vm_home_recent">%1$s %2$s ・ %3$d 杯 ・ %4$s</string>
+    <string name="vm_rate_value">%1$s %%/時</string>
+    <string name="vm_weight_value">%1$s kg</string>
+    <string name="vm_recorded">%1$sを記録（%2$d杯目）</string>
+    <string name="vm_unsupported_explanation">このアプリはヘルスコネクトの飲酒記録に対応した端末で利用できます。</string>
+    <string name="vm_duration_minutes">%1$d 分</string>
+    <string name="vm_duration_hours_minutes">%1$d 時間 %2$d 分</string>
+    <string name="vm_summary_title">%1$sの飲み会</string>
+    <string name="vm_month_heading">%1$d年 %2$d月</string>
+</resources>
