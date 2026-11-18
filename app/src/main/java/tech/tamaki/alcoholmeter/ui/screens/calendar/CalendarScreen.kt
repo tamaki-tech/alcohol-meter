@@ -79,14 +79,18 @@ private fun CalendarDayCell(cell: CalendarCell, onDayClick: (LocalDate) -> Unit)
     val shape = RoundedCornerShape(8.dp)
     Column(
         Modifier.fillMaxWidth().height(42.dp)
-            .background(if (status == DayStatus.ABSTINENT) MaterialTheme.colorScheme.primary.copy(alpha = 0.16f) else Color.Transparent, shape)
+            .background(if (status == DayStatus.ABSTINENT) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.18f) else Color.Transparent, shape)
             .border(if (today) 1.dp else 0.dp, if (today) MaterialTheme.colorScheme.primary else Color.Transparent, shape)
             .then(if (cell.date != null && !future) Modifier.clickable { onDayClick(cell.date) } else Modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Text(cell.date?.dayOfMonth?.toString().orEmpty(), fontSize = 14.sp, color = if (future || status == DayStatus.BEFORE_RECORDING) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f) else MaterialTheme.colorScheme.onSurface)
-        if (status == DayStatus.DRINKING) DrinkingDayMark() else Spacer(Modifier.height(5.dp))
+        when (status) {
+            DayStatus.DRINKING -> DrinkingDayMark()
+            DayStatus.ABSTINENT -> RestDayCheck()
+            else -> Spacer(Modifier.height(5.dp))
+        }
     }
 }
 
@@ -96,10 +100,27 @@ private fun DrinkingDayMark() {
     androidx.compose.foundation.Canvas(Modifier.size(5.dp)) { drawCircle(color) }
 }
 
+// 休肝日のチェックマーク。行の高さを変えないよう、数字の下に重ねて描く（レイアウト上は 5dp）
+@Composable
+private fun RestDayCheck() {
+    val color = MaterialTheme.colorScheme.tertiary
+    Box(Modifier.height(5.dp), contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Canvas(Modifier.requiredSize(10.dp)) {
+            val w = size.width
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(w * 0.15f, w * 0.52f)
+                lineTo(w * 0.40f, w * 0.77f)
+                lineTo(w * 0.87f, w * 0.25f)
+            }
+            drawPath(path, color, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.75.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round, join = androidx.compose.ui.graphics.StrokeJoin.Round))
+        }
+    }
+}
+
 @Composable
 private fun LegendItem(label: String, rest: Boolean = false, drinking: Boolean = false) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        if (rest) Box(Modifier.size(10.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f), RoundedCornerShape(3.dp)))
+        if (rest) Box(Modifier.size(12.dp).background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.18f), RoundedCornerShape(3.dp)), contentAlignment = Alignment.Center) { RestDayCheck() }
         if (drinking) DrinkingDayMark()
         Text(label, Modifier.padding(start = 5.dp), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
     }
