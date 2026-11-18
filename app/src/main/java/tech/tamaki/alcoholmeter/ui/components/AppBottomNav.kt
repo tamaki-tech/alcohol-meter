@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -52,7 +54,8 @@ fun AppBottomNav(
         androidx.compose.foundation.Canvas(Modifier.fillMaxWidth().height(1.dp)) {
             drawLine(dividerColor, androidx.compose.ui.geometry.Offset.Zero, androidx.compose.ui.geometry.Offset(size.width, 0f))
         }
-        Row(Modifier.fillMaxWidth().height(64.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+        // 文字サイズを大きくしたときはラベルが切れないよう高さを伸ばす（通常は 64dp）
+        Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).height(IntrinsicSize.Min), horizontalArrangement = Arrangement.SpaceEvenly) {
             navEntries.forEach { entry ->
                 val active = selected == entry.route
                 val tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
@@ -71,7 +74,7 @@ fun AppBottomNav(
                         modifier = Modifier.size(22.dp),
                         colorFilter = ColorFilter.tint(tint),
                     )
-                    Text(label, fontSize = 11.sp, fontWeight = FontWeight.Normal, color = tint)
+                    Text(label, fontSize = 11.sp, fontWeight = FontWeight.Normal, color = tint, maxLines = 1, softWrap = false)
                 }
             }
         }

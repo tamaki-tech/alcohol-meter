@@ -2,6 +2,12 @@ package tech.tamaki.alcoholmeter.ui.screens.summary
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import tech.tamaki.alcoholmeter.ui.components.AppButton
+import tech.tamaki.alcoholmeter.ui.components.AppButtonStyle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,18 +30,27 @@ import tech.tamaki.alcoholmeter.R
 import tech.tamaki.alcoholmeter.ui.components.DrinkColorDot
 
 @Composable
-fun SessionSummaryContent(state: SummaryUiState) {
+fun SessionSummaryContent(state: SummaryUiState, onEditDrink: ((String) -> Unit)? = null) {
     Column(Modifier.fillMaxWidth()) {
         MetricGrid(state.metrics)
         DrinkCategoryTags(state.categories)
         BacTrendCard(state)
-        Text("飲んだ順", Modifier.padding(top = 22.dp, bottom = 4.dp), fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.summary_drink_order), Modifier.padding(top = 22.dp, bottom = 4.dp), fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+        // 履歴詳細では同じ行から編集できるようにする（閲覧用と編集用の 2 つのリストを並べない）
         state.drinkRows.forEach { row ->
-            Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 4.dp)) {
-                Text(row.time, Modifier.padding(end = 12.dp), fontSize = 13.sp)
+            Row(
+                Modifier.fillMaxWidth().height(if (onEditDrink != null) 52.dp else 48.dp)
+                    .then(if (onEditDrink != null) Modifier.clickable { onEditDrink(row.id) } else Modifier)
+                    .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(row.time, Modifier.padding(end = 12.dp), fontSize = 14.sp)
                 DrinkColorDot(row.colorIndex)
-                Text(row.name, Modifier.weight(1f).padding(start = 10.dp), fontSize = 14.sp)
+                Text(row.name, Modifier.weight(1f).padding(start = 10.dp), fontSize = 14.sp, maxLines = 1)
                 Text(row.alcohol, fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+                if (onEditDrink != null) {
+                    AppButton("", { onEditDrink(row.id) }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_pencil, iconContentDescription = stringResource(R.string.history_edit_drink_named, row.name))
+                }
             }
         }
     }

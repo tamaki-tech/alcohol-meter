@@ -44,7 +44,8 @@ fun SettingsScreen(state: SettingsUiState, onEditPreset: (DrinkPreset) -> Unit, 
         }
         state.presets.forEachIndexed { index, preset ->
             Row(
-                Modifier.fillMaxWidth().height(52.dp).pointerInput(state.presets) {
+                // 行のどこをタップしても編集を開く（長押し→ドラッグは並べ替え）
+                Modifier.fillMaxWidth().height(52.dp).clickable { onEditPreset(preset) }.pointerInput(state.presets) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = { draggingPreset = preset.id },
                         onDragEnd = { draggingPreset = null },
@@ -65,7 +66,7 @@ fun SettingsScreen(state: SettingsUiState, onEditPreset: (DrinkPreset) -> Unit, 
                     Text(stringResource(R.string.settings_preset_volume, preset.volumeMl.toInt(), preset.abvPercent), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
                 }
                 Image(painterResource(R.drawable.ic_bell), null, Modifier.size(22.dp), colorFilter = ColorFilter.tint(if (preset.showInNotification) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)))
-                AppButton("", { onEditPreset(preset) }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, contentDescription = stringResource(R.string.settings_edit_preset, preset.name))
+                AppButton("", { onEditPreset(preset) }, Modifier.size(48.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_pencil, iconContentDescription = stringResource(R.string.settings_edit_preset, preset.name))
             }
         }
         AppButton(stringResource(R.string.add_preset), onAddPreset, Modifier.fillMaxWidth().padding(top = 8.dp), AppButtonStyle.Ghost, 48.dp, icon = R.drawable.ic_plus, iconContentDescription = stringResource(R.string.add_preset))

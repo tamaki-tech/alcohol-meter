@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,17 +76,34 @@ fun MetricStrip(
 @Composable
 private fun MetricCell(metric: MetricValue, modifier: Modifier = Modifier, valueModifier: Modifier = Modifier) {
     Column(modifier.padding(end = 6.dp)) {
-        Text(metric.label, fontSize = 11.sp, color = MaterialTheme.colorScheme.secondary)
+        Text(metric.label, fontSize = 11.sp, color = MaterialTheme.colorScheme.secondary, maxLines = 1)
+        FittedMetricValue(metric, valueModifier)
+    }
+}
+
+/**
+ * 指標の値を、セルの幅に収まる最大の文字サイズ（上限 34sp）で 1 行に表示する。
+ * 文字数や端末の文字サイズ設定（200% など）で数字が途中で切れないようにする。
+ * 等幅フォントなので、幅は文字数だけで決まる（毎秒変わる経過時間でも測り直しは文字数が変わったときだけ）
+ */
+@Composable
+private fun FittedMetricValue(metric: MetricValue, valueModifier: Modifier) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val measurer = rememberTextMeasurer()
+        val density = LocalDensity.current
+        val maxWidthPx = constraints.maxWidth
+        val unitStyle = TextStyle(fontSize = 15.sp)
+        val valueSize = remember(metric.value.length, metric.unit, maxWidthPx, density) {
+            val unitWidth = if (metric.unit.isEmpty()) 0 else measurer.measure(metric.unit, unitStyle).size.width + with(density) { 2.dp.roundToPx() }
+            var size = 34f
+            while (size > 12f && measurer.measure(metric.value, TextStyle(fontSize = size.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace)).size.width + unitWidth > maxWidthPx) size -= 1f
+            size
+        }
         Row(verticalAlignment = Alignment.Bottom, modifier = valueModifier) {
             Text(
                 metric.value,
-                fontSize = when {
-                    metric.label == "経過" && metric.value.length >= 8 -> 23.sp
-                    metric.value.length >= 7 -> 22.sp
-                    metric.value.length >= 6 -> 26.sp
-                    else -> 34.sp
-                },
-                lineHeight = 38.sp,
+                fontSize = valueSize.sp,
+                lineHeight = (valueSize * 1.12f).sp,
                 fontWeight = FontWeight.SemiBold,
                 color = if (metric.highlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
@@ -90,7 +111,7 @@ private fun MetricCell(metric: MetricValue, modifier: Modifier = Modifier, value
                 fontFamily = FontFamily.Monospace,
             )
             if (metric.unit.isNotEmpty()) {
-                Text(metric.unit, fontSize = 15.sp, modifier = Modifier.padding(start = 2.dp, bottom = 4.dp))
+                Text(metric.unit, style = unitStyle, maxLines = 1, modifier = Modifier.padding(start = 2.dp, bottom = 4.dp))
             }
         }
     }
