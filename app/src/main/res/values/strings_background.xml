@@ -1,0 +1,10 @@
+<resources>
+    <string name="notif_channel_party">飲み会の記録</string>
+    <string name="notif_channel_reminder">お開きの確認</string>
+    <string name="notif_party_title">飲み会中</string>
+    <string name="notif_party_body">%1$d 杯 ・ 推定 BAC %2$.3f%%（推定値）</string>
+    <string name="notif_reminder_body">最後の 1 杯（%1$s）から 6 時間たちました</string>
+    <string name="notif_end_at">%1$s でお開き</string>
+    <string name="notif_continue">続ける</string>
+    <string name="hc_permissions_rationale">飲酒記録をヘルスコネクトに書き込みます。体重の最新値を初期値として読み取ります。他のアプリの飲酒記録は読み取りません。</string>
+</resources>
